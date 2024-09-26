@@ -27,7 +27,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Serve static files from the "public" directory (for HTML, CSS, JS files)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('.'));  // Serve from root
+
 
 // Serve the main HTML file
 app.get('/', (req, res) => {
