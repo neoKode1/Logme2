@@ -1,0 +1,10 @@
+{
+<<<<<<< HEAD
+  "java.configuration.updateBuildConfiguration": "interactive"
+=======
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "CodeGPT.apiKey": "CodeGPT Plus Beta",
+  "CodeGPT.Autocomplete.enabled": true,
+  "livePreview.defaultPreviewPath": "/public/Driver Delivery Log Form.html"
+>>>>>>> 4046f2b (Initial commit)
+}

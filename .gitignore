@@ -1,0 +1,26 @@
+# Node.js dependencies
+node_modules/
+
+# Build files and distributions
+build/
+dist/
+*.tar
+*.zip
+
+# Environment files
+.env
+*.pem
+
+# Gradle-related files
+.gradle/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+*.tmp

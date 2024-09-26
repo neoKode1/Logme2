@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.sendgrid:sendgrid-java:4.9.3'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'javax:javaee-api:8.0' // Optional
+}
+
+application {
+    mainClass = 'com.logme2.SendEmail' // Adjust if different entry point is needed
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
