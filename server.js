@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware for CORS to allow requests from both GitHub Pages and localhost during development
 app.use(cors({
-    origin: ['https://neokode1.github.io', 'http://localhost:3000'], // Allow GitHub Pages and localhost
+    origin: ['https://neokode1.github.io', 'https://localhost:3000'], // Allow GitHub Pages and localhost
     methods: ['GET', 'POST'], // Allow only GET and POST requests
     credentials: true // Enable credentials if needed (cookies, etc.)
 }));
