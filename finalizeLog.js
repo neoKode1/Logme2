@@ -72,21 +72,28 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             const emailData = {
-                to: "kamasi.mahone@gmail.com", // Set recipient
+                personalizations: [{
+                    to: [{ email: "kamasi.mahone@gmail.com" }] // Set recipient
+                }],
+                from: { email: "kamasi@logme2.com" }, // Use your verified SendGrid email
                 subject: "Daily Log Finalized",
-                html: emailHtmlContent
+                content: [{
+                    type: 'text/html',
+                    value: emailHtmlContent
+                }]
             };
 
             console.log(emailData);
 
             try {
-                const response = await fetch('https://logme2.com/send-email', {
+                const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Authorization': `Bearer YOUR_SENDGRID_API_KEY`, // Replace with your SendGrid API key
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(emailData)
                 });
-                
-                
 
                 if (response.ok) {
                     displayMessage('Email sent successfully.', 'success');
@@ -95,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     window.location.href = '/confirmation.html'; // Redirect to confirmation page
                 } else {
                     const result = await response.json();
-                    displayMessage(`Failed to send email: ${result.message}`, 'error');
+                    displayMessage(`Failed to send email: ${result.errors[0].message}`, 'error');
                 }
             } catch (error) {
                 displayMessage(`Error sending email: ${error.message}`, 'error');
