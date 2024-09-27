@@ -80,11 +80,12 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(emailData);
 
             try {
-                const response = await fetch('https://logme2.com/send-email', {
+                const response = await fetch('https://your-custom-domain.com/send-email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(emailData)
                 });
+                
 
                 if (response.ok) {
                     displayMessage('Email sent successfully.', 'success');
