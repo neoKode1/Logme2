@@ -72,24 +72,17 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             const emailData = {
-                personalizations: [{
-                    to: [{ email: "kamasi.mahone@gmail.com" }], // Replace with recipient's email
-                    subject: "Daily Log Finalized"
-                }],
-                from: { email: "logme2@logme2.com" }, // Replace with your verified SendGrid sender email
-                content: [{
-                    type: "text/html",
-                    value: emailHtmlContent
-                }]
+                to: "kamasi.mahone@gmail.com",  // Replace with recipient email
+                subject: "Daily Log Finalized",
+                html: emailHtmlContent
             };
 
             try {
-                console.log('Sending email data to SendGrid:', emailData);
+                console.log('Sending email data to EC2 backend:', emailData);
             
-                const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+                const response = await fetch('http://44.208.163.169:3000/send-email', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer YOUR_SENDGRID_API_KEY`,  // Replace with your SendGrid API Key
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(emailData)
