@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('Sending email data to EC2 backend:', emailData);
 
                 const response = await fetch('https://44.208.163.169/send-email', {
-
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -90,49 +89,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 // Check if the response is successful
-                if (!response.ok) {
-                    // Handle specific status codes
-                    if (response.status === 401) {
-                        throw new Error('Unauthorized: Invalid API Key or missing credentials.');
-                    } else if (response.status === 403) {
-                        throw new Error('Forbidden: You do not have permission to send emails.');
-                    } else if (response.status === 405) {
-                        throw new Error('Method Not Allowed: The server does not allow POST requests to this endpoint.');
-                    }
-
-                    const contentType = response.headers.get("content-type");
-
-                    // Handle JSON error responses
-                    if (contentType && contentType.indexOf("application/json") !== -1) {
-                        const errorData = await response.json();
-                        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
-                    } else {
-                        // Handle non-JSON error responses
-                        const errorText = await response.text();
-                        console.error('Non-JSON error response:', errorText);
-                        throw new Error(`HTTP error! status: ${response.status}, Non-JSON response received. Please check server configuration.`);
-                    }
-                }
-
-                // If the response is OK and contains JSON
-                const contentType = response.headers.get("content-type");
-                if (contentType && contentType.indexOf("application/json") !== -1) {
+                if (response.ok) {
                     const result = await response.json();
                     console.log('Email sent successfully:', result);
 
-                    // Display success message
-                    displayMessage('Email sent successfully.', 'success');
-                } else {
-                    const responseText = await response.text();
-                    console.log('Server response (non-JSON):', responseText);
-                    displayMessage('Email sent, but server response was not in JSON format.', 'warning');
-                }
+                    // Clear logs from localStorage after successful email send
+                    localStorage.removeItem('savedLogs');
 
+                    // Clear the log entries table (or however you're showing the logs)
+                    const tableBody = document.querySelector('#logEntriesTable tbody');
+                    if (tableBody) {
+                        tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
+                    }
+
+                    // Show success message
+                    displayMessage('Log finalized and email sent successfully!', 'success');
+
+                    // Redirect to the confirmation page
+                    window.location.href = '/confirmation.html';  // Change this to the correct path of your confirmation page
+                } else {
+                    // Handle any errors from the API response
+                    const errorData = await response.json();
+                    console.error('Error sending email:', errorData);
+                    displayMessage(`Error: ${errorData.message || 'Failed to send email'}`, 'error');
+                }
             } catch (error) {
-                // Catch and log any error that occurs
                 console.error('Error sending email:', error);
-                displayMessage(`Error sending email: ${error.message}`, 'error');
+                displayMessage(`Error: ${error.message}`, 'error');
             }
+
 
         });
     }
