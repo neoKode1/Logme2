@@ -72,20 +72,26 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             const emailData = {
-                to: "kamasi.mahone@gmail.com",
-                subject: "Daily Log Finalized",
-                html: emailHtmlContent
+                personalizations: [{
+                    to: [{ email: "kamasi.mahone@gmail.com" }], // Replace with recipient's email
+                    subject: "Daily Log Finalized"
+                }],
+                from: { email: "logme2@logme2.com" }, // Replace with your verified SendGrid sender email
+                content: [{
+                    type: "text/html",
+                    value: emailHtmlContent
+                }]
             };
 
             try {
-                console.log('Sending email data:', emailData);
-                const response = await fetch('https://logme2.com/send-email', {
+                console.log('Sending email data to SendGrid:', emailData);
+                const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer YOUR_SENDGRID_API_KEY`,  // Replace with your SendGrid API Key
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(emailData),
-                    credentials: 'include'
+                    body: JSON.stringify(emailData)
                 });
             
                 if (!response.ok) {
