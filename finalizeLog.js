@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     displayMessage('Log finalized and email sent successfully!', 'success');
 
                     // Redirect to the confirmation page
-                    window.location.href = '/confirmation.html';  // Change this to the correct path of your confirmation page
+                    window.location.href = 'confirmation.html';  // Change this to the correct path of your confirmation page
                 } else {
                     // Handle any errors from the API response
                     const errorData = await response.json();
