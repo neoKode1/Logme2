@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 console.log('Sending email data to SendGrid:', emailData);
+            
                 const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
                     method: 'POST',
                     headers: {
@@ -94,47 +95,51 @@ document.addEventListener('DOMContentLoaded', function () {
                     body: JSON.stringify(emailData)
                 });
             
+                // Check if the response is successful
                 if (!response.ok) {
-                    if (response.status === 405) {
-                        throw new Error('Method Not Allowed: The server does not allow POST requests to this endpoint. Please check your server configuration.');
+                    // Handle specific status codes
+                    if (response.status === 401) {
+                        throw new Error('Unauthorized: Invalid API Key or missing credentials.');
+                    } else if (response.status === 403) {
+                        throw new Error('Forbidden: You do not have permission to send emails.');
+                    } else if (response.status === 405) {
+                        throw new Error('Method Not Allowed: The server does not allow POST requests to this endpoint.');
                     }
+            
                     const contentType = response.headers.get("content-type");
+            
+                    // Handle JSON error responses
                     if (contentType && contentType.indexOf("application/json") !== -1) {
                         const errorData = await response.json();
                         throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
                     } else {
+                        // Handle non-JSON error responses
                         const errorText = await response.text();
                         console.error('Non-JSON error response:', errorText);
                         throw new Error(`HTTP error! status: ${response.status}, Non-JSON response received. Please check server configuration.`);
                     }
                 }
             
+                // If the response is OK and contains JSON
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") !== -1) {
                     const result = await response.json();
                     console.log('Email sent successfully:', result);
-                
-                    if (result.message) {
-                        displayMessage(result.message, 'success');
-                    } else {
-                        displayMessage('Email sent successfully.', 'success');
-                    }
+            
+                    // Display success message
+                    displayMessage('Email sent successfully.', 'success');
                 } else {
                     const responseText = await response.text();
                     console.log('Server response (non-JSON):', responseText);
-                    displayMessage('Email sent, but server response was not in JSON format. Please check server configuration.', 'warning');
+                    displayMessage('Email sent, but server response was not in JSON format.', 'warning');
                 }
             
-                // Clear form and local storage here if needed
-                // finalizeForm.reset();
-                // localStorage.clear();
-            
-                // Redirect to confirmation page
-                // window.location.href = '/confirmation.html';
             } catch (error) {
+                // Catch and log any error that occurs
                 console.error('Error sending email:', error);
                 displayMessage(`Error sending email: ${error.message}`, 'error');
             }
+            
         });
     }
 
