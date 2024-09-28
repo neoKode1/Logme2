@@ -3,31 +3,26 @@ const bodyParser = require('body-parser');
 const sgMail = require('@sendgrid/mail');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const https = require('https');
 
+// Load environment variables from .env file
 dotenv.config();
 
+// Create Express app
 const app = express();
 
+// Middleware for CORS
 app.use(cors({
-    origin: ['https://www.logme2.com'],
+    origin: ['https://logme2.com'],  // Allow requests from your GitHub Pages site
     methods: ['GET', 'POST'],
-    credentials: true,
 }));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Set SendGrid API key from environment variables
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
+// POST route to handle sending emails via SendGrid
 app.post('/send-email', async (req, res) => {
     const { to, subject, html } = req.body;
 
@@ -37,7 +32,7 @@ app.post('/send-email', async (req, res) => {
 
     const msg = {
         to,
-        from: 'logme2@logme2.com',
+        from: 'logme2@logme2.com', // Use your verified email
         subject,
         html,
     };
@@ -51,12 +46,8 @@ app.post('/send-email', async (req, res) => {
     }
 });
 
-const options = {
-    key: fs.readFileSync('/path/to/your/privkey.pem'),
-    cert: fs.readFileSync('/path/to/your/fullchain.pem'),
-};
-
+// Start the server on port 3000
 const PORT = process.env.PORT || 3000;
-https.createServer(options, app).listen(PORT, () => {
-    console.log(`HTTPS server running on https://0.0.0.0:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });

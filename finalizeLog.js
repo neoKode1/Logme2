@@ -72,39 +72,44 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             const emailData = {
-                personalizations: [{
-                    to: [{ email: "kamasi.mahone@gmail.com" }] // Set recipient
-                }],
-                from: { email: "kamasi@logme2.com" }, // Use your verified SendGrid email
+                to: "kamasi.mahone@gmail.com", // Set recipient email
                 subject: "Daily Log Finalized",
-                content: [{
-                    type: 'text/html',
-                    value: emailHtmlContent
-                }]
+                html: emailHtmlContent
             };
 
-            console.log(emailData);
-
             try {
-                const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+                console.log('Sending email data:', emailData);
+                const response = await fetch('https://logme2.com/send-email', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer YOUR_SENDGRID_API_KEY`, // Replace with your SendGrid API key
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(emailData)
+                    body: JSON.stringify(emailData),
+                    credentials: 'include' // This is necessary if your server uses cookies for sessions
                 });
-
-                if (response.ok) {
-                    displayMessage('Email sent successfully.', 'success');
-                    localStorage.clear(); // Clear all local storage data
-                    finalizeForm.reset(); // Reset the form
-                    window.location.href = '/confirmation.html'; // Redirect to confirmation page
-                } else {
-                    const result = await response.json();
-                    displayMessage(`Failed to send email: ${result.errors[0].message}`, 'error');
+            
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
                 }
+            
+                const result = await response.json();
+                console.log('Email sent successfully:', result);
+            
+                if (result.message) {
+                    displayMessage(result.message, 'success');
+                } else {
+                    displayMessage('Email sent successfully.', 'success');
+                }
+            
+                // Clear form and local storage here if needed
+                // finalizeForm.reset();
+                // localStorage.clear();
+            
+                // Redirect to confirmation page
+                // window.location.href = '/confirmation.html';
             } catch (error) {
+                console.error('Error sending email:', error);
                 displayMessage(`Error sending email: ${error.message}`, 'error');
             }
         });
