@@ -79,15 +79,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 console.log('Sending email data to EC2 backend:', emailData);
-            
-                const response = await fetch('https://44.208.163.169:3000/send-email', {
+
+                const response = await fetch('https://44.208.163.169/send-email', {
+
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(emailData)
                 });
-            
+
                 // Check if the response is successful
                 if (!response.ok) {
                     // Handle specific status codes
@@ -98,9 +99,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else if (response.status === 405) {
                         throw new Error('Method Not Allowed: The server does not allow POST requests to this endpoint.');
                     }
-            
+
                     const contentType = response.headers.get("content-type");
-            
+
                     // Handle JSON error responses
                     if (contentType && contentType.indexOf("application/json") !== -1) {
                         const errorData = await response.json();
@@ -112,13 +113,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         throw new Error(`HTTP error! status: ${response.status}, Non-JSON response received. Please check server configuration.`);
                     }
                 }
-            
+
                 // If the response is OK and contains JSON
                 const contentType = response.headers.get("content-type");
                 if (contentType && contentType.indexOf("application/json") !== -1) {
                     const result = await response.json();
                     console.log('Email sent successfully:', result);
-            
+
                     // Display success message
                     displayMessage('Email sent successfully.', 'success');
                 } else {
@@ -126,13 +127,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.log('Server response (non-JSON):', responseText);
                     displayMessage('Email sent, but server response was not in JSON format.', 'warning');
                 }
-            
+
             } catch (error) {
                 // Catch and log any error that occurs
                 console.error('Error sending email:', error);
                 displayMessage(`Error sending email: ${error.message}`, 'error');
             }
-            
+
         });
     }
 
