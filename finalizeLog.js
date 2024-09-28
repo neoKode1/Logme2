@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 console.log('Sending email data to EC2 backend:', emailData);
             
-                const response = await fetch('http://44.208.163.169:3000/send-email', {
+                const response = await fetch('https://44.208.163.169:3000/send-email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
