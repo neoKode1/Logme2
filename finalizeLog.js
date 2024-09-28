@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 console.log('Sending email data:', emailData);
-                const response = await fetch('https://logme2.com/send-email', {
+                const response = await fetch('https://logme2@logme2.com/send-email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     } else {
                         const errorText = await response.text();
                         console.error('Non-JSON error response:', errorText);
-                        throw new Error(`HTTP error! status: ${response.status}, Non-JSON response received.`);
+                        throw new Error(`HTTP error! status: ${response.status}, Non-JSON response received. Please check server configuration.`);
                     }
                 }
             
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     const responseText = await response.text();
                     console.log('Server response (non-JSON):', responseText);
-                    displayMessage('Email sent, but server response was not in JSON format.', 'warning');
+                    displayMessage('Email sent, but server response was not in JSON format. Please check server configuration.', 'warning');
                 }
             
                 // Clear form and local storage here if needed
