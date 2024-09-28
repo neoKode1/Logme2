@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const finalizeForm = document.getElementById('finalizeForm');
     const finalizeBtn = document.getElementById('finalizeBtn');
     const odometerFinishInput = document.getElementById('odometerFinish');
-    const tableBody = document.querySelector('#logEntriesTable tbody'); // Get the table body
+    const tableBody = document.querySelector('#logEntriesTable tbody');
 
     // Function to handle form submission and send the daily log email
     if (finalizeForm && finalizeBtn) {
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             const emailData = {
-                to: "kamasi.mahone@gmail.com", // Set recipient email
+                to: "kamasi.mahone@gmail.com",
                 subject: "Daily Log Finalized",
                 html: emailHtmlContent
             };
@@ -85,21 +85,38 @@ document.addEventListener('DOMContentLoaded', function () {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(emailData),
-                    credentials: 'include' // This is necessary if your server uses cookies for sessions
+                    credentials: 'include'
                 });
             
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+                    if (response.status === 405) {
+                        throw new Error('Method Not Allowed: The server does not allow POST requests to this endpoint. Please check your server configuration.');
+                    }
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const errorData = await response.json();
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.message || 'Unknown error'}`);
+                    } else {
+                        const errorText = await response.text();
+                        console.error('Non-JSON error response:', errorText);
+                        throw new Error(`HTTP error! status: ${response.status}, Non-JSON response received.`);
+                    }
                 }
             
-                const result = await response.json();
-                console.log('Email sent successfully:', result);
-            
-                if (result.message) {
-                    displayMessage(result.message, 'success');
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const result = await response.json();
+                    console.log('Email sent successfully:', result);
+                
+                    if (result.message) {
+                        displayMessage(result.message, 'success');
+                    } else {
+                        displayMessage('Email sent successfully.', 'success');
+                    }
                 } else {
-                    displayMessage('Email sent successfully.', 'success');
+                    const responseText = await response.text();
+                    console.log('Server response (non-JSON):', responseText);
+                    displayMessage('Email sent, but server response was not in JSON format.', 'warning');
                 }
             
                 // Clear form and local storage here if needed
@@ -118,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to populate the log entries table
     function updateLogEntriesTable() {
         const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-        tableBody.innerHTML = ''; // Clear the table
+        tableBody.innerHTML = '';
 
         if (logEntries.length === 0) {
             tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
