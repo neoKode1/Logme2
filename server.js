@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const https = require('https');  // Ensure https is required
+const https = require('https');
 
 dotenv.config();
 
@@ -25,32 +25,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Set SendGrid API Key
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Serve static files from the 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Handle GET requests to root URL ("/")
+// Root GET route to show a welcome message
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));  // Serves your homepage
+    res.send('Welcome to LogMe Backend!');
 });
 
 // POST route to send emails via SendGrid
 app.post('/send-email', async (req, res) => {
     const { to, subject, html } = req.body;
 
-    // Validate required fields
     if (!to || !subject || !html) {
         return res.status(400).json({ message: 'Missing email parameters' });
     }
 
     const msg = {
         to,
-        from: 'logme2@logme2.com',  // Your verified SendGrid email
+        from: 'logme2@logme2.com',
         subject,
         html,
     };
 
     try {
-        // Send the email
         await sgMail.send(msg);
         res.status(200).json({ message: 'Email sent successfully' });
     } catch (error) {
@@ -59,10 +54,10 @@ app.post('/send-email', async (req, res) => {
     }
 });
 
-// SSL options for HTTPS (adjust paths for your SSL cert files)
+// SSL options for HTTPS
 const options = {
-    key: fs.readFileSync('/path/to/your/privkey.pem'),  // Replace with actual path
-    cert: fs.readFileSync('/path/to/your/fullchain.pem'),  // Replace with actual path
+    key: fs.readFileSync('/etc/letsencrypt/live/logme2.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/logme2.com/fullchain.pem'),
 };
 
 // Start HTTPS server
