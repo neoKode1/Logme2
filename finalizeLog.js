@@ -6,15 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const finalizeBtn = document.getElementById('finalizeBtn');
 
     // Function to send email
+// Function to send email
 function sendEmail(logData) {
     console.log('Sending email with data:', logData);
 
-    // Dynamically set the backend URL based on the environment
-    const backendUrl = process.env.NODE_ENV === 'production'
-        ? 'https://api.logme2.com/send-email'  // Replace with your actual domain
-        : 'http://localhost:3000/send-email';  // Use HTTP for development
+    // Detect the environment based on the current hostname
+    const backendUrl = window.location.hostname === 'logme2.com'
+        ? 'https://api.logme2.com/send-email'  // Production domain
+        : 'http://localhost:3000/send-email';  // Development (local) domain
 
-    // Use HTTPS for production backend to avoid mixed content issues
+    // Use fetch to send the email
     return fetch(backendUrl, {
         method: 'POST',
         headers: {
@@ -30,9 +31,10 @@ function sendEmail(logData) {
     })
     .catch(error => {
         console.error('Error sending email:', error);
-        throw error;  // Handle or propagate the error as needed
+        throw error; // Handle or propagate the error as needed
     });
 }
+
 
 
     // Function to get all log entries
