@@ -1,171 +1,123 @@
-// Function to calculate total miles
-function calculateTotalMiles() {
-    const odometerStart = parseFloat(localStorage.getItem('odometerStart')) || 0;
-    const odometerFinish = parseFloat(document.getElementById('odometerFinish').value) || 0;
-    document.getElementById('totalMiles').value = Math.max(odometerFinish - odometerStart, 0);
-}
+// Log when the script loads
+console.log('Finalize Daily Log script loaded');
 
-// Event listener for when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const finalizeForm = document.getElementById('finalizeForm');
     const finalizeBtn = document.getElementById('finalizeBtn');
-    const odometerFinishInput = document.getElementById('odometerFinish');
-    const tableBody = document.querySelector('#logEntriesTable tbody');
 
-    // Function to handle form submission and send the daily log email
-    if (finalizeForm && finalizeBtn) {
-        finalizeBtn.addEventListener('click', async function (e) {
-            console.log('Complete and Send button clicked');
-            e.preventDefault();
+    // Function to send email
+    function sendEmail(logData) {
+        console.log('Sending email with data:', logData);
 
-            const odometerFinish = parseFloat(document.getElementById('odometerFinish').value) || 0;
-            const totalMiles = parseFloat(document.getElementById('totalMiles').value) || 0;
-            const fuelPurchase = document.getElementById('fuelPurchase').value || 'N/A';
-            const comments = document.getElementById('comments').value || 'N/A';
-
-            let logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-
-            if (logEntries.length === 0) {
-                displayMessage('No log entries found.', 'error');
-                return;
+        return fetch('https://44.208.163.169/send-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(logData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            let tableRows = '';
-            logEntries.forEach(entry => {
-                tableRows += `
-                    <tr>
-                        <td>${entry.hotel || 'N/A'}</td>
-                        <td>${entry.arrivalTime || 'N/A'}</td>
-                        <td>${entry.departureTime || 'N/A'}</td>
-                        <td>${entry.cartsDelivered || 'N/A'}</td>
-                        <td>${entry.cartsReceived || 'N/A'}</td>
-                        <td>${entry.stainBags || 'N/A'}</td>
-                        <td>${entry.calculatedWaitTime || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-
-            const emailHtmlContent = `
-                <div style="font-family: Arial, sans-serif; color: #333;">
-                    <h2 style="background-color: #4CAF50; color: white; padding: 10px;">Daily Log Finalized</h2>
-                    <p>Odometer Finish: ${odometerFinish}</p>
-                    <p>Total Miles: ${totalMiles}</p>
-                    <p>Fuel Purchase: ${fuelPurchase}</p>
-                    <p>Comments: ${comments}</p>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th>Hotel</th>
-                                <th>Arrival Time</th>
-                                <th>Departure Time</th>
-                                <th>Carts Delivered</th>
-                                <th>Carts Received</th>
-                                <th>Stain Bags</th>
-                                <th>Wait Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            const emailData = {
-                to: "kamasi.mahone@gmail.com",  // Replace with recipient email
-                subject: "Daily Log Finalized",
-                html: emailHtmlContent
-            };
-
-            try {
-                console.log('Sending email data to EC2 backend:', emailData);
-
-                const response = await fetch('https://44.208.163.169/send-email', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(emailData)
-                });
-
-                // Check if the response is successful
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Email sent successfully:', result);
-
-                    // Clear logs from localStorage after successful email send
-                    localStorage.removeItem('savedLogs');
-
-                    // Clear the log entries table (or however you're showing the logs)
-                    const tableBody = document.querySelector('#logEntriesTable tbody');
-                    if (tableBody) {
-                        tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
-                    }
-
-                    // Show success message
-                    displayMessage('Log finalized and email sent successfully!', 'success');
-
-                    // Redirect to the confirmation page
-                    window.location.href = 'confirmation.html';  // Change this to the correct path of your confirmation page
-                } else {
-                    // Handle any errors from the API response
-                    const errorData = await response.json();
-                    console.error('Error sending email:', errorData);
-                    displayMessage(`Error: ${errorData.message || 'Failed to send email'}`, 'error');
-                }
-            } catch (error) {
-                console.error('Error sending email:', error);
-                displayMessage(`Error: ${error.message}`, 'error');
-            }
-
-
+            return response.json();
         });
     }
 
-    // Function to populate the log entries table
-    function updateLogEntriesTable() {
-        const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+    // Function to get all log entries
+    function getLogEntries() {
+        const entries = JSON.parse(localStorage.getItem('logEntries') || '[]');
+        console.log('Retrieved log entries:', entries);
+        return entries;
+    }
+
+    // Function to clear log entries
+    function clearLogEntries() {
+        localStorage.removeItem('logEntries');
+        console.log('Log entries cleared from localStorage');
+    }
+
+    // Event listener for the finalize form submission
+    finalizeForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Finalize form submitted');
+
+        const odometerFinish = document.getElementById('odometerFinish').value;
+        const totalMiles = document.getElementById('totalMiles').value;
+        const fuelPurchase = document.getElementById('fuelPurchase').value;
+        const comments = document.getElementById('comments').value;
+
+        const finalData = {
+            odometerFinish,
+            totalMiles,
+            fuelPurchase,
+            comments,
+            logEntries: getLogEntries()
+        };
+
+        finalizeBtn.disabled = true;
+        finalizeBtn.textContent = 'Sending...';
+
+        sendEmail(finalData)
+            .then(data => {
+                console.log('Email sent successfully:', data);
+                clearLogEntries();
+                console.log('Redirecting to confirmation page...');
+                window.location.href = 'confirmation.html';
+            })
+            .catch(error => {
+                console.error('Error sending email:', error);
+                alert('An error occurred while sending the email. Please try again.');
+                finalizeBtn.disabled = false;
+                finalizeBtn.textContent = 'Complete and Send';
+            });
+    });
+
+    // Calculate total miles when odometer finish is entered
+    document.getElementById('odometerFinish').addEventListener('input', function() {
+        const odometerStart = localStorage.getItem('odometerStart');
+        const odometerFinish = this.value;
+        if (odometerStart && odometerFinish) {
+            const totalMiles = odometerFinish - odometerStart;
+            document.getElementById('totalMiles').value = totalMiles;
+        }
+    });
+
+    // Populate the table with saved log entries
+    function populateLogEntriesTable() {
+        const logEntries = getLogEntries();
+        const tableBody = document.querySelector('#logEntriesTable tbody');
         tableBody.innerHTML = '';
 
-        if (logEntries.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
-        } else {
-            logEntries.forEach(entry => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${entry.hotel || 'N/A'}</td>
-                    <td>${entry.arrivalTime || 'N/A'}</td>
-                    <td>${entry.departureTime || 'N/A'}</td>
-                    <td>${entry.cartsDelivered || 'N/A'}</td>
-                    <td>${entry.cartsReceived || 'N/A'}</td>
-                    <td>${entry.stainBags || 'N/A'}</td>
-                    <td>${entry.calculatedWaitTime || 'N/A'}</td>
-                `;
-            });
-        }
+        logEntries.forEach((entry, index) => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">${entry.hotel}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${entry.arrivalTime}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${entry.departureTime}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${entry.cartsDelivered}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${entry.cartsReceived}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${entry.stainBags}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${entry.waitTime}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <button onclick="editEntry(${index})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
+                    <button onclick="deleteEntry(${index})" class="ml-2 text-red-600 hover:text-red-900">Delete</button>
+                </td>
+            `;
+        });
     }
 
-    // Calculate total miles when odometerFinish value changes
-    if (odometerFinishInput) {
-        odometerFinishInput.addEventListener('input', calculateTotalMiles);
-    }
-
-    // Calculate total miles on page load if odometerFinish has a value
-    calculateTotalMiles();
-
-    // Populate log entries table on page load
-    updateLogEntriesTable();
+    // Call this function when the page loads
+    populateLogEntriesTable();
 });
 
-// Function to display messages
-function displayMessage(message, type) {
-    const messageElement = document.getElementById('message');
-    if (messageElement) {
-        messageElement.textContent = message;
-        messageElement.className = type;
-        messageElement.style.display = 'block';
-        setTimeout(() => {
-            messageElement.style.display = 'none';
-        }, 5000);
-    }
+// Functions for editing and deleting entries (to be implemented)
+function editEntry(index) {
+    console.log('Edit entry at index:', index);
+    // Implement edit functionality
+}
+
+function deleteEntry(index) {
+    console.log('Delete entry at index:', index);
+    // Implement delete functionality
 }
