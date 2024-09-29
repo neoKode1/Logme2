@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendEmail(logData) {
         console.log('Sending email with data:', logData);
 
-        return fetch('https://44.208.163.169/send-email', {
+        return fetch('http://44.208.163.169/send-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -67,7 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error sending email:', error);
-                alert('An error occurred while sending the email. Please try again.');
+                console.error('Error details:', error.message);
+                if (error instanceof TypeError) {
+                    console.error('Network error. Please check your internet connection.');
+                    alert('Network error. Please check your internet connection and try again.');
+                } else {
+                    alert('An error occurred while sending the email. Please try again.');
+                }
                 finalizeBtn.disabled = false;
                 finalizeBtn.textContent = 'Complete and Send';
             });
