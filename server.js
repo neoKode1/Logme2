@@ -64,10 +64,10 @@ app.post('/send-email', async (req, res) => {
     }
 });
 
-// SSL options for HTTPS (update paths to your certificate and key files)
+// SSL options for HTTPS with the correct paths for your Let's Encrypt certificates
 const options = {
-    key: fs.readFileSync('/path/to/your/privkey.pem'),
-    cert: fs.readFileSync('/path/to/your/fullchain.pem'),
+    key: fs.readFileSync('/etc/letsencrypt/live/logme2.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/logme2.com/fullchain.pem'),
 };
 
 // Start HTTPS server
