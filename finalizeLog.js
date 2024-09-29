@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendEmail(logData) {
         console.log('Sending email with data:', logData);
     
+        // Use HTTPS for the backend to avoid mixed content issues
         return fetch('https://44.208.163.169:3000/send-email', {
             method: 'POST',
             headers: {
