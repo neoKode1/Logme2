@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to send email
     function sendEmail(logData) {
         console.log('Sending email with data:', logData);
-
-        return fetch('http://44.208.163.169/send-email', {
+    
+        return fetch('http://44.208.163.169:3000/send-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
