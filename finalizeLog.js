@@ -6,24 +6,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const finalizeBtn = document.getElementById('finalizeBtn');
 
     // Function to send email
-    function sendEmail(logData) {
-        console.log('Sending email with data:', logData);
-    
-        // Use HTTPS for the backend to avoid mixed content issues
-        return fetch('https://44.208.163.169:3000/send-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(logData),
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        });
-    }
+function sendEmail(logData) {
+    console.log('Sending email with data:', logData);
+
+    // Dynamically set the backend URL based on the environment
+    const backendUrl = process.env.NODE_ENV === 'production'
+        ? 'https://api.logme2.com/send-email'  // Replace with your actual domain
+        : 'http://localhost:3000/send-email';  // Use HTTP for development
+
+    // Use HTTPS for production backend to avoid mixed content issues
+    return fetch(backendUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(logData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .catch(error => {
+        console.error('Error sending email:', error);
+        throw error;  // Handle or propagate the error as needed
+    });
+}
+
 
     // Function to get all log entries
     function getLogEntries() {
