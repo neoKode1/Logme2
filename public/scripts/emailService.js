@@ -45,39 +45,22 @@ async function authorize() {
   return client;
 }
 
-async function sendEmail(to, subject, htmlContent) {
-  const auth = await authorize();
-  const gmail = google.gmail({version: 'v1', auth});
-  const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
-  const messageParts = [
-    `From: Your App <your-app-email@example.com>`,
-    `To: ${to}`,
-    'Content-Type: text/html; charset=utf-8',
-    'MIME-Version: 1.0',
-    `Subject: ${utf8Subject}`,
-    '',
-    htmlContent
-  ];
-  const message = messageParts.join('\n');
-  const encodedMessage = Buffer.from(message)
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-
-  try {
-    const res = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw: encodedMessage,
-      },
+async function sendEmail(to, subject, html) {
+    return fetch('/send-email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ to, subject, html }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message === 'Email sent successfully') {
+            return Promise.resolve();
+        } else {
+            return Promise.reject(new Error(data.message));
+        }
     });
-    console.log('Email sent successfully:', res.data);
-    return res.data;
-  } catch (error) {
-    console.error('Error sending email:', error);
-    throw error;
-  }
 }
 
 module.exports = { sendEmail };
