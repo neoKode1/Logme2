@@ -10,7 +10,7 @@
     <link href="styles/styles.css" rel="stylesheet">
     <style>
         body {
-            background-image: url('/images/yellowVest.jpeg');
+            background-image: url('images/yellowvest.jpeg');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
@@ -212,7 +212,7 @@
                             displayMessage('Email sent successfully.', 'success');
                             localStorage.clear();
                             finalizeForm.reset();
-                            window.location.href = '/confirmation.html';
+                            window.location.href = 'confirmation.html';
                         } else {
                             console.error('Failed to send email:', result);
                             displayMessage(`Failed to send email: ${result.message}`, 'error');

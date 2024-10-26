@@ -28,17 +28,20 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Update the static file serving configuration
-app.use(express.static('public'));
-app.use('/scripts', express.static(path.join(__dirname, 'public/scripts')));
-app.use('/styles', express.static(path.join(__dirname, 'public/styles')));
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
+// Serve static files from the root directory
+app.use(express.static(__dirname));
 
-// Add specific route for app.js
-app.get('/app.js', (req, res) => {
-    res.setHeader('Content-Type', 'application/javascript');
-    res.sendFile(path.join(__dirname, 'public', 'app.js'));
-});
+// Serve static files from the public directory
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+// Serve images
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+
+// Serve scripts
+app.use('/scripts', express.static(path.join(__dirname, 'public', 'scripts')));
+
+// Serve styles
+app.use('/styles', express.static(path.join(__dirname, 'public', 'styles')));
 
 // Make sure Express sets the correct MIME type for JavaScript files
 app.get('*.js', function(req, res, next) {
@@ -48,7 +51,15 @@ app.get('*.js', function(req, res, next) {
 
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/AddLogEntry', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'AddLogEntry.html'));
+});
+
+app.get('/confirmation', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'confirmation.html'));
 });
 
 app.get('/driver-log', (req, res) => {
@@ -57,6 +68,14 @@ app.get('/driver-log', (req, res) => {
 
 app.get('/finalize-log', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'FinalizeDailyLog.html'));
+});
+
+app.get('/output.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'output.css'));
+});
+
+app.get('/service-worker.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'service-worker.js'));
 });
 
 // Add detailed request logging middleware
@@ -167,4 +186,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, '0.0.0.0', () => {
     console.log(`Server running at http://0.0.0.0:${port}`);
 });
-
