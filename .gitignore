@@ -1,26 +1,25 @@
-# Node.js dependencies
-node_modules/
-
-# Build files and distributions
+# Build directories
 build/
-dist/
-*.tar
-*.zip
-
-# Environment files
-.env
-*.pem
-
-# Gradle-related files
+bin/
 .gradle/
 
-# OS-specific files
-.DS_Store
-Thumbs.db
+# IDE files
+.idea/
+*.iml
+.vscode/
 
 # Logs
 *.log
 
-# Temporary files
-tmp/
-*.tmp
+# Environment files
+.env
+
+# Node modules
+node_modules/
+
+# Compiled files
+*.class
+
+credentials.json
+token.json
+SendEmailServlet.java
