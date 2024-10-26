@@ -175,7 +175,7 @@ async function sendLogViaEmail(completeLog) {
     `;
 
     try {
-        const response = await fetch('https://localhost:3000/send-email', {
+        const response = await fetch('http://localhost:3000/send-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -215,19 +215,10 @@ function saveLogLocally(completeLog) {
 
 // Additional functions and event listeners for the Finalize Daily Log page
 function calculateTotalMiles() {
-    const odometerFinishInput = document.getElementById('odometerFinish');
-    const totalMilesInput = document.getElementById('totalMiles');
-    const odometerStart = parseFloat(localStorage.getItem('odometerStart') || '0');
-
-    if (odometerFinishInput && totalMilesInput && !isNaN(odometerStart)) {
-        const odometerFinish = parseFloat(odometerFinishInput.value || '0');
-        if (!isNaN(odometerFinish)) {
-            const totalMiles = odometerFinish - odometerStart;
-            totalMilesInput.value = totalMiles > 0 ? totalMiles.toFixed(1) : '0';
-        } else {
-            totalMilesInput.value = '';
-        }
-    }
+    const odometerStart = parseFloat(localStorage.getItem('odometerStart')) || 0;
+    const odometerFinish = parseFloat(document.getElementById('odometerFinish').value) || 0;
+    const totalMiles = Math.max(odometerFinish - odometerStart, 0);
+    document.getElementById('totalMiles').value = totalMiles.toFixed(1);
 }
 
 function populateHotelOptions() {
@@ -306,3 +297,14 @@ document.getElementById('logEntryForm').addEventListener('submit', function(even
     event.target.reset();
 });
 
+// Add this function
+function displayMessage(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}

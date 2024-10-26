@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .form-container {
+    @apply backdrop-blur-lg bg-white/15 rounded-2xl shadow-2xl border border-white/25 transition-all duration-400 p-8;
+  }
+
+  .form-container:hover {
+    @apply shadow-lg transform -translate-y-1;
+  }
+
+  .input-glow {
+    @apply shadow-md bg-black/40 border-none rounded-lg p-4 text-base text-black transition-all duration-300;
+  }
+
+  .input-glow:focus {
+    @apply shadow-lg transform scale-102 bg-white/10 outline-none;
+  }
+
+  .button-glow {
+    @apply bg-white/40 text-blue-900 px-8 py-3 rounded-full border-none shadow-md transition-all duration-400 uppercase tracking-wide;
+  }
+
+  .button-glow:hover {
+    @apply bg-blue-800 shadow-lg -translate-y-1;
+  }
+
+  .button-glow:active {
+    @apply bg-blue-700 translate-y-0.5 shadow-md;
+  }
+}
+
+/* Custom styles that can't be handled by Tailwind */
+body {
+  background-image: url('/public/images/logistics.jpg.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: 'Arial', sans-serif;
+  color: #0e0d0d;
+}
+
+input, select {
+  @apply bg-black/40 border-none text-black transition-all duration-300 rounded-lg p-4 mt-2;
+}
+
+input:focus, select:focus {
+  @apply bg-white/20 border-blue-500 outline-none;
+}
+
+.form-title {
+  @apply text-gray-200 text-shadow-lg text-2xl uppercase tracking-wide mb-6;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.notification {
+  @apply fixed top-5 right-5 bg-green-500 text-white p-4 rounded shadow-lg z-50;
+  animation: slideInRight 0.5s ease-in-out, fadeOut 0.5s ease-in-out 3s forwards;
+}
+
+@keyframes slideInRight {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#trucklogo {
+  @apply rounded-[10%];
+}

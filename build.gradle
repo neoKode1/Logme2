@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'war'
     id 'application'
 }
 
@@ -10,11 +11,29 @@ repositories {
 dependencies {
     implementation 'com.sendgrid:sendgrid-java:4.9.3'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation 'javax:javaee-api:8.0' // Optional
+    implementation 'javax:javaee-api:8.0'
+    
+    implementation 'org.slf4j:slf4j-api:1.7.32'
+    implementation 'ch.qos.logback:logback-classic:1.2.6'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+war {
+    webAppDirName = 'webapp'
 }
 
 application {
-    mainClass = 'com.logme2.SendEmail' // Adjust if different entry point is needed
+    mainClass = 'com.logme2.SendEmail'
 }
 
 sourceCompatibility = '11'

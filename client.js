@@ -2,19 +2,28 @@
 const socket = new WebSocket(`ws://${window.location.hostname}:3001`);
 
 socket.onopen = (event) => {
-  console.log('Connected to WebSocket server');
+  console.log('[WS] Connected to WebSocket server');
+  console.log('[WS] ReadyState:', socket.readyState);
 };
 
 socket.onmessage = (event) => {
-  console.log('Message from server:', event.data);
+  console.log('[WS] Received message:', event.data);
+  try {
+    const data = JSON.parse(event.data);
+    console.log('[WS] Parsed data:', data);
+  } catch (e) {
+    console.error('[WS] Failed to parse message:', e);
+  }
 };
 
 socket.onerror = (error) => {
-  console.error('WebSocket error:', error);
+  console.error('[WS] WebSocket error:', error);
 };
 
 socket.onclose = (event) => {
-  console.log('Disconnected from WebSocket server');
+  console.log('[WS] Disconnected from WebSocket server');
+  console.log('[WS] Close code:', event.code);
+  console.log('[WS] Close reason:', event.reason);
 };
 
 // Function to send log data via WebSocket
@@ -28,6 +37,9 @@ function sendLogData(logData) {
 
 // Function to send email via HTTP
 async function sendEmail(to, subject, text) {
+  console.log('[EMAIL] Preparing to send email');
+  console.log('[EMAIL] Parameters:', { to, subject, textLength: text?.length });
+
   try {
     const response = await fetch('/send-email', {
       method: 'POST',
@@ -36,10 +48,20 @@ async function sendEmail(to, subject, text) {
       },
       body: JSON.stringify({ to, subject, text }),
     });
+    
+    console.log('[EMAIL] Response status:', response.status);
     const data = await response.json();
-    console.log('Email send response:', data);
+    console.log('[EMAIL] Response data:', data);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('[EMAIL] Error sending email:', error);
+    console.error('[EMAIL] Error details:', {
+      message: error.message,
+      stack: error.stack
+    });
   }
 }
 

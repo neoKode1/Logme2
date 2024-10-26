@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Finalize Daily Log</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="styles/output.css" rel="stylesheet">
+    <link href="styles/styles.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('/images/yellowVest.jpeg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        #logo {
+            border-radius: 8px;
+            max-width: 150px;
+            width: 100%;
+            height: auto;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .form-container {
+                padding: 2rem;
+            }
+        }
+
+        input, select, textarea, button {
+            font-size: 16px;
+            height: 3rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div class="form-container space-y-6 bg-white bg-opacity-90 rounded-xl shadow-2xl mb-8">
+            <div class="text-center">
+                <img id="logo" src="images/logmelogo.jpg" alt="App Logo" class="mx-auto">
+                <h1 class="mt-6 text-3xl font-extrabold text-gray-900">Finalize Daily Log</h1>
+            </div>
+            <form id="finalizeForm" class="mt-8 space-y-6">
+                <div class="rounded-md shadow-sm -space-y-px">
+                    <div>
+                        <label for="odometerFinish" class="sr-only">Odometer Finish:</label>
+                        <input type="number" id="odometerFinish" name="odometerFinish" required
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            placeholder="Odometer Finish">
+                    </div>
+                    <div>
+                        <label for="totalMiles" class="sr-only">Total Miles:</label>
+                        <input type="number" id="totalMiles" name="totalMiles" readonly
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            placeholder="Total Miles">
+                    </div>
+                    <div>
+                        <label for="fuelPurchase" class="sr-only">Fuel Purchase:</label>
+                        <select id="fuelPurchase" name="fuelPurchase" required
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
+                            <option value="">Fuel Purchase?</option>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="comments" class="sr-only">Comments:</label>
+                        <textarea id="comments" name="comments"
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                            placeholder="Comments (optional)"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" id="finalizeBtn"
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Finalize Log
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="w-full max-w-4xl">
+            <h2 id="review" class="text-xl sm:text-2xl font-bold mb-4 text-center text-white">Review and Edit Saved Log Entries</h2>
+            <div class="table-container bg-white bg-opacity-90 rounded-xl shadow-2xl p-4">
+                <table id="logEntriesTable" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hotel</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival Time</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure Time</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carts Delivered</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carts Received</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stain Bags</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wait Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Table rows will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/finalize-log.js"></script>
+    <script src="scripts/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const finalizeForm = document.getElementById('finalizeForm');
+            const finalizeBtn = document.getElementById('finalizeBtn');
+            const odometerFinishInput = document.getElementById('odometerFinish');
+            const tableBody = document.querySelector('#logEntriesTable tbody'); // Get the table body
+
+            // Function to handle form submission and send the daily log email
+            if (finalizeForm && finalizeBtn) {
+                finalizeBtn.addEventListener('click', async function (e) {
+                    console.log('Complete and Send button clicked');
+                    e.preventDefault();
+
+                    const odometerFinish = parseFloat(document.getElementById('odometerFinish').value) || 0;
+                    const totalMiles = parseFloat(document.getElementById('totalMiles').value) || 0;
+                    const fuelPurchase = document.getElementById('fuelPurchase').value || 'N/A';
+                    const comments = document.getElementById('comments').value || 'N/A';
+
+                    let logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+
+                    if (logEntries.length === 0) {
+                        displayMessage('No log entries found.', 'error');
+                        return;
+                    }
+
+                    let tableRows = '';
+                    logEntries.forEach(entry => {
+                        tableRows += `
+                            <tr>
+                                <td>${entry.hotel || 'N/A'}</td>
+                                <td>${entry.arrivalTime || 'N/A'}</td>
+                                <td>${entry.departureTime || 'N/A'}</td>
+                                <td>${entry.cartsDelivered || 'N/A'}</td>
+                                <td>${entry.cartsReceived || 'N/A'}</td>
+                                <td>${entry.stainBags || 'N/A'}</td>
+                                <td>${entry.calculatedWaitTime || 'N/A'}</td>
+                            </tr>
+                        `;
+                    });
+
+                    const emailHtmlContent = `
+                        <div style="font-family: Arial, sans-serif; color: #333;">
+                            <h2 style="background-color: #4CAF50; color: white; padding: 10px;">Daily Log Finalized</h2>
+                            <p>Odometer Finish: ${odometerFinish}</p>
+                            <p>Total Miles: ${totalMiles}</p>
+                            <p>Fuel Purchase: ${fuelPurchase}</p>
+                            <p>Comments: ${comments}</p>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>Hotel</th>
+                                        <th>Arrival Time</th>
+                                        <th>Departure Time</th>
+                                        <th>Carts Delivered</th>
+                                        <th>Carts Received</th>
+                                        <th>Stain Bags</th>
+                                        <th>Wait Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+                    const emailData = {
+                        to: "kamasi.mahone@gmail.com", // Set recipient
+                        subject: "Daily Log Finalized",
+                        html: emailHtmlContent
+                    };
+
+                    try {
+                        console.log('Sending email with data:', emailData);
+
+                        const response = await fetch('/send-email', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify(emailData)
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            console.log('Email sent successfully:', result);
+                            displayMessage('Email sent successfully.', 'success');
+                            localStorage.clear();
+                            finalizeForm.reset();
+                            window.location.href = '/confirmation.html';
+                        } else {
+                            console.error('Failed to send email:', result);
+                            displayMessage(`Failed to send email: ${result.message}`, 'error');
+                            if (result.details) {
+                                console.error('Additional error details:', result.details);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error sending email:', error);
+                        displayMessage(`Error sending email: ${error.message}`, 'error');
+                    }
+                });
+            }
+
+            // Function to populate the log entries table
+            function updateLogEntriesTable() {
+                const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+                tableBody.innerHTML = ''; // Clear the table
+
+                if (logEntries.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
+                } else {
+                    logEntries.forEach(entry => {
+                        const row = tableBody.insertRow();
+                        row.innerHTML = `
+                            <td>${entry.hotel || 'N/A'}</td>
+                            <td>${entry.arrivalTime || 'N/A'}</td>
+                            <td>${entry.departureTime || 'N/A'}</td>
+                            <td>${entry.cartsDelivered || 'N/A'}</td>
+                            <td>${entry.cartsReceived || 'N/A'}</td>
+                            <td>${entry.stainBags || 'N/A'}</td>
+                            <td>${entry.calculatedWaitTime || 'N/A'}</td>
+                        `;
+                    });
+                }
+            }
+
+            // Calculate total miles when odometerFinish value changes
+            if (odometerFinishInput) {
+                odometerFinishInput.addEventListener('input', calculateTotalMiles);
+            }
+
+            // Calculate total miles on page load if odometerFinish has a value
+            calculateTotalMiles();
+
+            // Populate log entries table on page load
+            updateLogEntriesTable();
+        });
+    </script>
+    <script>
+        // Add this function if not already present
+        function displayMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.className = `alert alert-${type} fixed top-4 right-4 p-4 rounded shadow-lg`;
+            messageDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            messageDiv.style.color = 'white';
+            document.body.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+    </script>
+
+</body>
+
+</html>

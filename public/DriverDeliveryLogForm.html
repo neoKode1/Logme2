@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Driver Delivery Log Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="/styles/output.css" rel="stylesheet">
+    <link href="/styles/styles.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-image: url('/images/driverblue.jpeg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+
+        #logo {
+            border-radius: 8px;
+            max-width: 150px;
+            width: 100%;
+            height: auto;
+        }
+
+        #form-container {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            #form-container {
+                padding: 2rem;
+            }
+        }
+
+        input, select, button {
+            font-size: 16px;
+            height: 3rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+        <div id="form-container" class="bg-white bg-opacity-90 rounded-xl shadow-2xl space-y-6">
+            <div class="text-center">
+                <img id="logo" src="/images/logmelogo.jpg" alt="App Logo" class="logo mx-auto">
+
+                <h1 class="mt-6 text-3xl font-extrabold text-gray-900">Driver Delivery Log Form</h1>
+            </div>
+            <form id="driverLogForm" class="space-y-6">
+                <div class="rounded-md shadow-sm space-y-4">
+                    <div>
+                        <label for="truckNumber" class="sr-only">Truck #</label>
+                        <input type="text" id="truckNumber" name="truckNumber" required
+                            class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="Truck #">
+                    </div>
+                    <div>
+                        <label for="driverName" class="sr-only">Driver Name</label>
+                        <input type="text" id="driverName" name="driverName" required
+                            class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="Driver Name">
+                    </div>
+                    <div>
+                        <label for="odometerStart" class="sr-only">Odometer Start</label>
+                        <input type="number" id="odometerStart" name="odometerStart" required
+                            class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            placeholder="Odometer Start">
+                    </div>
+                    <div>
+                        <label for="date" class="sr-only">Date</label>
+                        <input type="date" id="date" name="date" required
+                            class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="day" class="sr-only">Day</label>
+                        <select id="day" name="day" required
+                            class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="" disabled selected>Select Day</option>
+                            <option value="SU">Sunday</option>
+                            <option value="M">Monday</option>
+                            <option value="T">Tuesday</option>
+                            <option value="W">Wednesday</option>
+                            <option value="H">Thursday</option>
+                            <option value="F">Friday</option>
+                            <option value="S">Saturday</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" id="saveAndContinueBtn"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        Save & Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js" defer></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const saveAndContinueBtn = document.getElementById('saveAndContinueBtn');
+            
+            if (saveAndContinueBtn) {
+                saveAndContinueBtn.addEventListener('click', function (e) {
+                    e.preventDefault(); // Prevent default form submission
+                    
+                    // Validate form
+                    const form = document.getElementById('driverLogForm');
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+
+                    try {
+                        const formData = new FormData(form);
+                        // Save form data to localStorage
+                        for (let [key, value] of formData.entries()) {
+                            localStorage.setItem(key, value);
+                        }
+                        // Navigate to next page
+                        window.location.href = "AddLogEntry.html";
+                    } catch (error) {
+                        console.error('Error saving form data:', error);
+                        alert('There was an error saving your data. Please try again.');
+                    }
+                });
+            } else {
+                console.error('Save and Continue button not found');
+            }
+        });
+    </script>
+</body>
+
+</html>
