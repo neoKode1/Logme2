@@ -10,22 +10,77 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Complete and Send button clicked');
             e.preventDefault();
 
-            const odometerFinish = parseFloat(document.getElementById('odometerFinish').value) || 0;
-            const totalMiles = parseFloat(document.getElementById('totalMiles').value) || 0;
-            const fuelPurchase = document.getElementById('fuelPurchase').value || 'N/A';
-            const comments = document.getElementById('comments').value || 'N/A';
+            try {
+                const logEntries = await fetchLogEntries();
 
-            let logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+                if (logEntries.logs.length === 0) {
+                    displayMessage('No log entries found.', 'error');
+                    return;
+                }
 
-            if (logEntries.length === 0) {
-                displayMessage('No log entries found.', 'error');
-                return;
+                const emailHtmlContent = generateEmailContent({
+                    odometerFinish: parseFloat(document.getElementById('odometerFinish').value) || 0,
+                    totalMiles: parseFloat(document.getElementById('totalMiles').value) || 0,
+                    fuelPurchase: document.getElementById('fuelPurchase').value || 'N/A',
+                    comments: document.getElementById('comments').value || 'N/A'
+                }, logEntries.logs);
+
+                const emailData = {
+                    to: "recipient@example.com", // Set recipient
+                    subject: "Daily Log Finalized",
+                    html: emailHtmlContent
+                };
+
+                const response = await fetch('/send-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(emailData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to send email');
+                }
+
+                console.log('Email sent successfully');
+                displayMessage('Email sent successfully.', 'success');
+                // Clear form and redirect
+                finalizeForm.reset();
+                window.location.href = 'confirmation.html';
+            } catch (error) {
+                console.error('Error finalizing log:', error);
+                displayMessage(`Error finalizing log: ${error.message}`, 'error');
             }
+        });
+    }
 
-            let tableRows = '';
-            logEntries.forEach(entry => {
-                tableRows += `
-                    <tr>
+    // Function to fetch log entries from Google Cloud Storage
+    async function fetchLogEntries() {
+        try {
+            const response = await fetch('/api/logs');
+            if (!response.ok) {
+                throw new Error('Failed to fetch log entries');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching log entries:', error);
+            throw error;
+        }
+    }
+
+    // Function to populate the log entries table
+    async function updateLogEntriesTable() {
+        try {
+            const logEntries = await fetchLogEntries();
+            tableBody.innerHTML = ''; // Clear the table
+
+            if (logEntries.logs.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
+            } else {
+                logEntries.logs.forEach(entry => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
                         <td>${entry.hotel || 'N/A'}</td>
                         <td>${entry.arrivalTime || 'N/A'}</td>
                         <td>${entry.departureTime || 'N/A'}</td>
@@ -33,79 +88,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         <td>${entry.cartsReceived || 'N/A'}</td>
                         <td>${entry.stainBags || 'N/A'}</td>
                         <td>${entry.calculatedWaitTime || 'N/A'}</td>
-                    </tr>
-                `;
-            });
-
-            const emailHtmlContent = `
-                <div style="font-family: Arial, sans-serif; color: #333;">
-                    <h2 style="background-color: #4CAF50; color: white; padding: 10px;">Daily Log Finalized</h2>
-                    <p>Odometer Finish: ${odometerFinish}</p>
-                    <p>Total Miles: ${totalMiles}</p>
-                    <p>Fuel Purchase: ${fuelPurchase}</p>
-                    <p>Comments: ${comments}</p>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th>Hotel</th>
-                                <th>Arrival Time</th>
-                                <th>Departure Time</th>
-                                <th>Carts Delivered</th>
-                                <th>Carts Received</th>
-                                <th>Stain Bags</th>
-                                <th>Wait Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            const emailData = {
-                to: "kamasi.mahone@gmail.com", // Set recipient
-                subject: "Daily Log Finalized",
-                html: emailHtmlContent
-            };
-
-            try {
-                console.log('Sending email with data:', emailData);
-
-                const response = await sendEmail(emailData.to, emailData.subject, emailData.html);
-
-                console.log('Email sent successfully:', response);
-                displayMessage('Email sent successfully.', 'success');
-                localStorage.clear();
-                finalizeForm.reset();
-                window.location.href = 'confirmation.html';
-            } catch (error) {
-                console.error('Error sending email:', error);
-                displayMessage(`Error sending email: ${error.message}`, 'error');
+                    `;
+                });
             }
-        });
-    }
-
-    // Function to populate the log entries table
-    function updateLogEntriesTable() {
-        const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-        tableBody.innerHTML = ''; // Clear the table
-
-        if (logEntries.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
-        } else {
-            logEntries.forEach(entry => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${entry.hotel || 'N/A'}</td>
-                    <td>${entry.arrivalTime || 'N/A'}</td>
-                    <td>${entry.departureTime || 'N/A'}</td>
-                    <td>${entry.cartsDelivered || 'N/A'}</td>
-                    <td>${entry.cartsReceived || 'N/A'}</td>
-                    <td>${entry.stainBags || 'N/A'}</td>
-                    <td>${entry.calculatedWaitTime || 'N/A'}</td>
-                `;
-            });
+        } catch (error) {
+            console.error('Error updating log entries table:', error);
+            displayMessage('Failed to load log entries', 'error');
         }
     }
 
@@ -140,4 +128,45 @@ function displayMessage(message, type) {
     setTimeout(() => {
         messageDiv.remove();
     }, 5000);
+}
+
+// Function to generate email content
+function generateEmailContent(finalData, logEntries) {
+    let tableRows = logEntries.map(entry => `
+        <tr>
+            <td>${entry.hotel || 'N/A'}</td>
+            <td>${entry.arrivalTime || 'N/A'}</td>
+            <td>${entry.departureTime || 'N/A'}</td>
+            <td>${entry.cartsDelivered || 'N/A'}</td>
+            <td>${entry.cartsReceived || 'N/A'}</td>
+            <td>${entry.stainBags || 'N/A'}</td>
+            <td>${entry.calculatedWaitTime || 'N/A'}</td>
+        </tr>
+    `).join('');
+
+    return `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+            <h2 style="background-color: #4CAF50; color: white; padding: 10px;">Daily Log Finalized</h2>
+            <p>Odometer Finish: ${finalData.odometerFinish}</p>
+            <p>Total Miles: ${finalData.totalMiles}</p>
+            <p>Fuel Purchase: ${finalData.fuelPurchase}</p>
+            <p>Comments: ${finalData.comments}</p>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Hotel</th>
+                        <th>Arrival Time</th>
+                        <th>Departure Time</th>
+                        <th>Carts Delivered</th>
+                        <th>Carts Received</th>
+                        <th>Stain Bags</th>
+                        <th>Wait Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
 }

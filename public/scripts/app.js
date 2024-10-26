@@ -53,46 +53,81 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-// Submits log entry and updates local storage
-function submitLogEntry() {
-  const logEntryForm = document.getElementById('logEntryForm');
-  if (logEntryForm) {
-    const formData = new FormData(logEntryForm);
-    const logEntry = Object.fromEntries(formData.entries());
-
-    // Save log entry to local storage
-    let logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-    logEntry.id = Date.now(); // Unique ID for each log entry
-    logEntries.push(logEntry);
-    localStorage.setItem('savedLogs', JSON.stringify(logEntries)); // Save all log entries to local storage
-
-    updateLoggedDataTable();
-    logEntryForm.reset();
-    displayMessage('Log entry submitted successfully', 'success');
-  } else {
-    displayMessage('Error: Log entry form not found', 'error');
+// Function to submit a log entry
+async function submitLogEntry(logEntry) {
+  try {
+    const response = await fetch('/api/logs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(logEntry),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to submit log entry');
+    }
+    const result = await response.json();
+    console.log('Log entry submitted:', result);
+    return result;
+  } catch (error) {
+    console.error('Error submitting log entry:', error);
+    throw error;
   }
 }
 
-// Updates the logged data table
-function updateLoggedDataTable() {
-  const tableBody = document.querySelector('#loggedDataTable tbody');
-  const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+// Function to fetch log entries
+async function fetchLogEntries(page = 1, limit = 10) {
+  try {
+    const response = await fetch(`/api/logs?page=${page}&limit=${limit}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch log entries');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching log entries:', error);
+    throw error;
+  }
+}
 
-  tableBody.innerHTML = '';
-  logEntries.forEach((entry, index) => {
-    const row = tableBody.insertRow();
-    row.innerHTML = `
-      <td data-label="Hotel">${entry.hotel}</td>
-      <td data-label="Arrival Time">${entry.arrivalTime}</td>
-      <td data-label="Departure Time">${entry.departureTime}</td>
-      <td data-label="Carts Delivered">${entry.cartsDelivered}</td>
-      <td data-label="Carts Received">${entry.cartsReceived}</td>
-      <td data-label="Stain Bags">${entry.stainBags || ''}</td>
-      <td data-label="Wait Time">${entry.waitTime || ''}</td>
-      <td data-label="Actions"><button class="edit-btn" onclick="editLogEntry(${index})">Edit</button></td>
-    `;
-  });
+// Function to update a log entry
+async function updateLogEntry(fileName, updatedLogEntry) {
+  try {
+    const response = await fetch(`/api/logs/${fileName}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedLogEntry),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update log entry');
+    }
+    const result = await response.json();
+    console.log('Log entry updated:', result);
+    return result;
+  } catch (error) {
+    console.error('Error updating log entry:', error);
+    throw error;
+  }
+}
+
+// Function to delete a log entry
+async function deleteLogEntry(fileName) {
+  try {
+    const response = await fetch(`/api/logs/${fileName}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete log entry');
+    }
+    const result = await response.json();
+    console.log('Log entry deleted:', result);
+    return result;
+  } catch (error) {
+    console.error('Error deleting log entry:', error);
+    throw error;
+  }
 }
 
 // Function to edit log entry

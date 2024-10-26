@@ -1,4 +1,4 @@
-# Driver Delivery Log System
+# LogMe2 - Driver Delivery Log Application
 
 ## Overview
 The Driver Delivery Log System is a robust web application designed to streamline the process of logging delivery activities for drivers. This tool allows drivers to efficiently record details about their deliveries, including mileage, stops, and key metrics that are crucial for daily operations. With features like automatic wait time calculations, data persistence, and daily summary emails, the system is an essential tool for managing delivery logs effectively.
@@ -9,6 +9,10 @@ The Driver Delivery Log System is a robust web application designed to streamlin
 - **Daily Log Finalization**: Provides an easy way for drivers to finalize their daily logs and send a comprehensive summary via email to designated recipients.
 - **Responsive and Intuitive Design**: The application features a fully responsive design, ensuring optimal usability on both desktop and mobile devices.
 - **Local Data Persistence**: Leverages localStorage for saving logs temporarily, allowing users to retrieve, edit, and manage logs even when offline.
+- **Google Sign-In integration**: Allows users to sign in with their Google account for a seamless experience.
+- **Offline functionality with service worker**: Enables users to access the application even when offline, with the service worker caching resources for later use.
+- **Google Cloud Storage for data persistence**: Stores log data in Google Cloud Storage for persistent storage and easy retrieval.
+- **Email functionality using Gmail API**: Sends daily log summaries via email using the Gmail API.
 
 ## Technology Stack
 - **Frontend**: HTML5, CSS3, JavaScript (ES6)
@@ -16,35 +20,46 @@ The Driver Delivery Log System is a robust web application designed to streamlin
 - **Email Service**: Gmail API for dispatching daily log summaries via email
 - **Local Storage**: Utilizes localStorage for temporary data persistence, ensuring quick access to log entries
 - **Styling**: Tailwind CSS for responsive and modern UI design
+- **Service Workers**: Utilizes service workers for offline functionality and caching resources
 
 ## Setup Instructions
 
-### Prerequisites
-- Node.js: Ensure Node.js is installed on your machine.
-- Google Cloud Platform Account: Set up a project and enable the Gmail API.
-
-### Installation
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/driver-delivery-log-system.git
-   cd driver-delivery-log-system
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/logme2.git
+   cd logme2
    ```
 
-2. **Install Dependencies**:
-   ```bash
+2. Install dependencies:
+   ```
    npm install
    ```
 
-3. **Set up Google Cloud Credentials**:
-   - Create a `credentials.json` file in the root directory with your Google Cloud credentials.
-   - Run the application once to generate the `token.json` file for Gmail API authentication.
+3. Set up Google Cloud Project:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Enable the Google Cloud Storage API and Gmail API
+   - Create a service account and download the JSON key file
 
-4. **Start the Server**:
-   ```bash
+4. Set up environment variables:
+   - Create a `.env` file in the root directory
+   - Add the following variables:
+     ```
+     GOOGLE_CLOUD_PROJECT=your-project-id
+     GOOGLE_APPLICATION_CREDENTIALS=path/to/your/service-account-key.json
+     GOOGLE_CLOUD_STORAGE_BUCKET=your-bucket-name
+     SENDGRID_API_KEY=your-sendgrid-api-key
+     ```
+
+5. Start the server:
+   ```
    npm start
    ```
 
-5. **Access the Application**: Open your web browser and navigate to `http://localhost:3000`.
+6. Open the application in your browser:
+   ```
+   http://localhost:3000
+   ```
 
 ## Usage
 1. **Log Entries**: Begin by entering essential details such as the truck number, driver name, and the starting odometer reading. Continue by adding log entries for each stop throughout the day.

@@ -1,36 +1,40 @@
-const CACHE_NAME = 'logme-cache-v1';
+const CACHE_NAME = 'logme-v1';
 const urlsToCache = [
   '/',
-  '/public/styles.css',
-  '/public/app.js',
-  '/public/images/logme%20logo.jpg',
-  '/public/Add%20Log%20Entry.html',
-  '/public/Driver%20Delivery%20Log%20Form.html',
-  '/public/Finalize%20Daily%20Log.html',
-  // Add other assets you want to cache
+  '/index.html',
+  '/public/DriverDeliveryLogForm.html',
+  '/public/AddLogEntry.html',
+  '/public/FinalizeDailyLog.html',
+  '/public/confirmation.html',
+  '/public/styles/output.css',
+  '/public/styles/styles.css',
+  '/public/scripts/app.js',
+  '/public/scripts/auth.js',
+  '/public/scripts/emailService.js',
+  '/public/scripts/finalizeLog.js',
+  '/public/images/logmelogo.jpg',
+  '/public/images/18wheeler.jpeg',
+  '/public/images/yellowVest.jpeg',
+  '/public/images/driverblue.jpeg',
+  '/public/images/drivergrey.jpeg'
 ];
 
 // Install event - cache assets
-self.addEventListener('install', function(event) {
-  console.log('Service Worker installing.');
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+      .then((cache) => cache.addAll(urlsToCache))
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', function(event) {
-  console.log('Service Worker activating.');
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(function(cacheName) {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
             return caches.delete(cacheName);
           }
         })
@@ -40,29 +44,23 @@ self.addEventListener('activate', function(event) {
 });
 
 // Fetch event - serve cached content if available
-self.addEventListener('fetch', function(event) {
-  console.log('Fetching:', event.request.url);
+self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then(function(response) {
+      .then((response) => {
         if (response) {
-          return response; // Return the cached response if found
+          return response;
         }
         return fetch(event.request).then(
-          function(response) {
-            // Check if we received a valid response
+          (response) => {
             if(!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
-
-            // Clone the response. A response is a stream and because we want the browser to consume the response as well as the cache consuming the response, we need to clone it so we have two streams.
             const responseToCache = response.clone();
-
             caches.open(CACHE_NAME)
-              .then(function(cache) {
+              .then((cache) => {
                 cache.put(event.request, responseToCache);
               });
-
             return response;
           }
         );

@@ -8,6 +8,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="public/styles/output.css" rel="stylesheet">
     <link href="public/styles/styles.css" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    <script src="public/scripts/auth.js"></script>
 
     <style>
         body {
@@ -79,7 +82,16 @@
             <img id="logo" src="public/images/logmelogo.jpg" alt="App Logo" class="logo mx-auto">
 
             <h1 class="text-white text-4xl font-extrabold mt-4">Welcome to LogMe</h1>
+            
+            <!-- Google Sign-In button -->
+            <div id="g_id_onload"
+                 data-client_id="851921648343-kvhsn7ttiv1s363tpjpkv35a3rhe8m7s.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse">
+            </div>
+            <div class="g_id_signin mt-4" data-type="standard"></div>
+            
             <button id="startbutton" onclick="startLogging()" class="btn-primary mt-8">Start Logging</button>
+            <button id="viewLogsButton" onclick="window.location.href='public/ViewLogs.html'" class="btn-primary mt-4" style="display: none;">View Logs</button>
         </div>
     </div>
 

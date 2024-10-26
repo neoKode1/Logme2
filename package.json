@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
-    "@google-cloud/storage": "^6.0.0",
+    "@google-cloud/storage": "^6.12.0",
     "@sendgrid/mail": "^8.1.4",
     "axios": "^1.7.4",
     "body-parser": "^1.20.3",
@@ -24,7 +24,9 @@
     "driver-log": "file:",
     "express": "^4.21.1",
     "google-auth-library": "^9.14.2",
-    "googleapis": "^105.0.0"
+    "googleapis": "^105.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
