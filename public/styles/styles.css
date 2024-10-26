@@ -215,6 +215,7 @@ textarea {
 .focus\:ring-offset-2:focus { --tw-ring-offset-width: 2px; }
 
 .form-container {
+  margin-top: 70%;
   width: 90%;
   max-width: 600px;
   padding: 20px;
