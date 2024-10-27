@@ -117,3 +117,5 @@ typings/
 tmp/
 temp/
 .env
+
+logmeclient.json
