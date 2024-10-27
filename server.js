@@ -358,3 +358,7 @@ app.post('/api/google-signin', async (req, res) => {
     res.status(401).json({success: false, message: 'Invalid token'});
   }
 });
+
+app.get('/api/google-client-id', (req, res) => {
+  res.json({ clientId: process.env.GOOGLE_CLIENT_ID });
+});

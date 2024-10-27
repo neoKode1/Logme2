@@ -4,7 +4,15 @@ fetch('/api/google-client-id')
   .then(response => response.json())
   .then(data => {
     googleClientId = data.clientId;
-    initializeGoogleSignIn();
+    google.accounts.id.initialize({
+      client_id: googleClientId,
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignInDiv"),
+      { theme: "outline", size: "large" }
+    );
+    google.accounts.id.prompt(); // Display the One Tap dialog
   })
   .catch(error => console.error('Error fetching Google Client ID:', error));
 
@@ -23,6 +31,7 @@ function handleCredentialResponse(response) {
     if (data.success) {
       console.log('Signed in as: ' + data.email);
       localStorage.setItem('userEmail', data.email);
+      localStorage.setItem('jwtToken', data.token); // Store the JWT token
       updateUIForSignedInUser(data.email);
     } else {
       console.error('Sign-in failed');
@@ -60,4 +69,3 @@ document.addEventListener('DOMContentLoaded', () => {
   loadGoogleSignInAPI();
   checkAuthState();
 });
-
