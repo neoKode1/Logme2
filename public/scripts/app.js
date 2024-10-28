@@ -1,14 +1,28 @@
 console.log('app.js loaded');
 
-const hotels = [
-  "Chateau Elan", "Ritz Carlton", "Indigo", "Candler", "Kimpton",
-  "Marriott Airport", "Starling", "Bellyard/Rooftop", "Loews",
-  "Hilton Downtown", "Regis", "Thompson", "Galleria", "Westin North",
-  "Avalon", "Hamilton", "Colee", "Westin North", "Westin Buckhead", "Westin Peachtree", "Courtland", "Marriot Marquis",
-  "Embassy Suites", "The American", "Montgomery", "Cambria/Margaritaville"
-];
+// Remove the hotels array since it's defined in AddLogEntry.html
 
-const { sendEmail } = require('./emailService');
+// Remove require statement and use fetch for email service
+async function sendEmail(to, subject, htmlContent) {
+  try {
+    const response = await fetch('/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ to, subject, html: htmlContent })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to send email');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
+}
 
 // Generates a list of number options
 function generateOptions(start, end) {
@@ -167,7 +181,17 @@ function displayMessage(message, type) {
 // Populate hotel options
 function populateHotelOptions() {
   const hotelSelect = document.querySelector('select[name="hotel"]');
-  hotels.forEach(hotel => {
+  if (!hotelSelect) {
+    console.log('Hotel select element not found');
+    return;
+  }
+  
+  if (typeof HOTELS === 'undefined') {
+    console.error('HOTELS array not found. Make sure config.js is loaded before app.js');
+    return;
+  }
+
+  HOTELS.forEach(hotel => {
     const option = document.createElement('option');
     option.value = hotel;
     option.textContent = hotel;
@@ -178,15 +202,19 @@ function populateHotelOptions() {
 // Populate number options
 function populateNumberOptions() {
   const selects = document.querySelectorAll('select[name="cartsDelivered"], select[name="cartsReceived"], select[name="stainBags"]');
-  selects.forEach(select => {
-    select.innerHTML = generateOptions(0, 99);
-  });
+  if (selects.length > 0) {  // Add this check
+    selects.forEach(select => {
+      select.innerHTML = generateOptions(0, 99);
+    });
+  }
 }
 
 // Populate time options
 function populateTimeOptions() {
   const waitTimeSelect = document.querySelector('select[name="waitTime"]');
-  waitTimeSelect.innerHTML = generateTimeOptions();
+  if (waitTimeSelect) {  // Add this check
+    waitTimeSelect.innerHTML = generateTimeOptions();
+  }
 }
 
 // Placeholder for completeAndSendDailyLog function
@@ -267,26 +295,139 @@ function generateEmailContent(driverInfo, logEntries) {
   return content;
 }
 
+// Add this function for updating the logged data table
+function updateLoggedDataTable() {
+    const tableBody = document.querySelector('#loggedDataTable tbody');
+    if (!tableBody) {
+        console.log('Table body element not found');
+        return;
+    }
+
+    const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+    tableBody.innerHTML = '';
+
+    logEntries.forEach((entry, index) => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${entry.hotel || ''}</td>
+            <td>${entry.arrivalTime || ''}</td>
+            <td>${entry.departureTime || ''}</td>
+            <td>${entry.cartsDelivered || ''}</td>
+            <td>${entry.cartsReceived || ''}</td>
+            <td>${entry.stainBags || ''}</td>
+            <td>${entry.calculatedWaitTime || ''}</td>
+            <td>
+                <button class="edit-btn text-indigo-600 hover:text-indigo-900" onclick="editLogEntry(${index})">Edit</button>
+                <button class="delete-btn text-white bg-red-600 hover:bg-red-800 px-2 py-1 rounded ml-2" onclick="deleteLogEntry(${index})">Delete</button>
+            </td>
+        `;
+    });
+}
+
+// Add this function for populating dropdowns
+function populateDropdown(dropdown, optionsArray, placeholder = "") {
+    if (!dropdown) {
+        console.log('Dropdown element not found');
+        return;
+    }
+
+    dropdown.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
+    optionsArray.forEach(optionText => {
+        const option = document.createElement('option');
+        option.value = optionText;
+        option.textContent = optionText;
+        dropdown.appendChild(option);
+    });
+}
+
 // Initialize page on load
 function initializePage() {
   console.log('Initializing page...');
+  
+  // Check if we're on the log entry form page
   if (document.getElementById('logEntryForm')) {
-    populateHotelOptions();
-    populateNumberOptions();
-    populateTimeOptions();
-    updateLoggedDataTable();
+    console.log('Initializing log entry form...');
+    try {
+      populateHotelOptions();
+      populateNumberOptions();
+      populateTimeOptions();
+      updateLoggedDataTable();
+    } catch (error) {
+      console.error('Error initializing log entry form:', error);
+    }
   }
 
+  // Check if we're on the finalize log form page
   if (document.getElementById('finalizeLogForm')) {
-    const odometerFinish = document.getElementById('odometerFinish');
-    odometerFinish.addEventListener('input', calculateTotalMiles);
+    console.log('Initializing finalize log form...');
+    try {
+      const odometerFinish = document.getElementById('odometerFinish');
+      if (odometerFinish) {
+        odometerFinish.addEventListener('input', calculateTotalMiles);
+      }
 
-    const completeAndSendBtn = document.getElementById('completeAndSendBtn');
-    completeAndSendBtn.addEventListener('click', completeAndSendDailyLog);
+      const completeAndSendBtn = document.getElementById('completeAndSendBtn');
+      if (completeAndSendBtn) {
+        completeAndSendBtn.addEventListener('click', completeAndSendDailyLog);
+      }
 
-    calculateTotalMiles();
-    updateLoggedDataTable();
+      calculateTotalMiles();
+      updateLoggedDataTable();
+    } catch (error) {
+      console.error('Error initializing finalize log form:', error);
+    }
   }
 }
 
 document.addEventListener('DOMContentLoaded', initializePage);
+
+// Add this function to app.js
+function saveAndContinue() {
+    console.log('Save & Continue function called');
+    saveLogEntry(true);  // true indicates we want to continue to next page
+}
+
+// Update the saveLogEntry function
+function saveLogEntry(shouldContinue) {
+    console.log('=== Save Log Entry Function Called ===');
+    console.log('shouldContinue:', shouldContinue);
+    
+    const form = document.getElementById('logEntryForm');
+    if (!form.checkValidity()) {
+        console.log('Form validation failed');
+        form.reportValidity();
+        return;
+    }
+
+    const logEntry = {
+        hotel: document.getElementById('hotel').value,
+        arrivalTime: document.getElementById('arrivalTime').value,
+        departureTime: document.getElementById('departureTime').value,
+        cartsDelivered: document.getElementById('cartsDelivered').value,
+        cartsReceived: document.getElementById('cartsReceived').value,
+        stainBags: document.getElementById('stainBags').value,
+        calculatedWaitTime: document.getElementById('calculatedWaitTime').value
+    };
+    console.log('Log Entry Data:', logEntry);
+
+    try {
+        let savedLogs = JSON.parse(localStorage.getItem('savedLogs')) || [];
+        savedLogs.push(logEntry);
+        localStorage.setItem('savedLogs', JSON.stringify(savedLogs));
+        console.log('Log entry saved to localStorage');
+
+        // Update the table
+        updateLoggedDataTable();
+        form.reset();
+
+        if (shouldContinue) {
+            console.log('Attempting to navigate to FinalizeDailyLog.html');
+            window.location.href = 'FinalizeDailyLog.html';
+        } else {
+            displayMessage('Log entry saved successfully', 'success');
+        }
+    } catch (error) {
+        console.error('Error in saveLogEntry:', error);
+        displayMessage('Error saving log entry', 'error');
+    }
+}

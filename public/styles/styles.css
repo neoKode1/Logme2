@@ -414,3 +414,38 @@ html, body {
 .success-message {
     @apply text-green-500 text-sm mt-1;
 }
+
+/* Standard button styles */
+.btn-primary {
+    background-color: #357ABD !important;
+    color: midnightblue !important;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-secondary {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-primary:hover {
+    background-color: #2868A9 !important;
+}
+
+.btn-secondary:hover {
+    background-color: #3d8b40 !important;
+}

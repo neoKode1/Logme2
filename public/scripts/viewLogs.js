@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) {
-        window.location.href = '/index.html'; // Redirect to login page if not authenticated
+    // Check authentication
+    const token = localStorage.getItem('googleToken');
+    if (!token) {
+        console.log('No authentication token found, redirecting to login');
+        window.location.href = '/';
         return;
     }
 
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const logEntriesContainer = document.getElementById('logEntries');
     const paginationContainer = document.getElementById('pagination');
 
-    searchForm.addEventListener('submit', function(e) {
+    searchForm?.addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(searchForm);
         const searchParams = new URLSearchParams(formData);
@@ -18,55 +20,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchLogs(searchParams, page = 1) {
         try {
-            const token = localStorage.getItem('jwtToken'); // Assume we store the JWT in localStorage after login
+            const token = localStorage.getItem('googleToken');
+            console.log('Fetching logs with token:', token?.substring(0, 20) + '...');
+            
             const response = await fetch(`/api/logs?${searchParams.toString()}&page=${page}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
+
             if (!response.ok) {
-                if (response.status === 401) {
-                    // Token might be expired, redirect to login
-                    window.location.href = '/index.html';
+                if (response.status === 401 || response.status === 403) {
+                    console.error('Authentication failed');
+                    window.location.href = '/';
                     return;
                 }
                 throw new Error('Failed to fetch logs');
             }
+
             const data = await response.json();
+            console.log('Received logs:', data);
             displayLogs(data.logs);
             displayPagination(data.currentPage, data.totalPages);
         } catch (error) {
             console.error('Error fetching logs:', error);
-            logEntriesContainer.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error fetching logs. Please try again.</td></tr>';
+            if (logEntriesContainer) {
+                logEntriesContainer.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-red-500">Error fetching logs. Please try again.</td></tr>';
+            }
         }
     }
 
     function displayLogs(logs) {
-        if (logs.length === 0) {
-            logEntriesContainer.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center">No logs found matching the search criteria.</td></tr>';
+        if (!logEntriesContainer) return;
+
+        if (!logs || logs.length === 0) {
+            logEntriesContainer.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center">No logs found.</td></tr>';
             return;
         }
 
         logEntriesContainer.innerHTML = logs.map(log => `
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap">${log.driverName || 'N/A'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${log.truckNumber || 'N/A'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">${log.date || 'N/A'}</td>
+            <tr class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">${log.hotel || 'N/A'}</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <button onclick="editLog('${log.id}')" class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                    <button onclick="viewDetails('${log.id}')" class="ml-2 text-green-600 hover:text-green-900">View Details</button>
-                </td>
+                <td class="px-6 py-4 whitespace-nowrap">${log.arrivalTime || 'N/A'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${log.departureTime || 'N/A'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${log.cartsDelivered || 'N/A'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${log.cartsReceived || 'N/A'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${log.stainBags || 'N/A'}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${log.calculatedWaitTime || 'N/A'}</td>
             </tr>
         `).join('');
     }
 
     function displayPagination(currentPage, totalPages) {
+        if (!paginationContainer) return;
+
         let paginationHTML = '';
         for (let i = 1; i <= totalPages; i++) {
             paginationHTML += `
                 <button onclick="fetchLogs(new URLSearchParams(new FormData(document.getElementById('searchForm'))), ${i})" 
-                        class="${i === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200'} px-3 py-1 rounded">
+                        class="${i === currentPage ? 'bg-blue-500 text-white' : 'bg-gray-200'} px-3 py-1 rounded mx-1">
                     ${i}
                 </button>
             `;
@@ -74,18 +87,15 @@ document.addEventListener('DOMContentLoaded', function() {
         paginationContainer.innerHTML = paginationHTML;
     }
 
+    // Function to display messages
+    function displayMessage(message, type) {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.className = `fixed top-4 right-4 p-4 rounded shadow-lg ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
+        document.body.appendChild(messageDiv);
+        setTimeout(() => messageDiv.remove(), 3000);
+    }
+
     // Initial load of logs
     fetchLogs(new URLSearchParams());
 });
-
-function editLog(logId) {
-    // Implement the edit functionality
-    console.log(`Editing log with ID: ${logId}`);
-    // You can redirect to an edit page or open a modal for editing
-}
-
-function viewDetails(logId) {
-    // Implement the view details functionality
-    console.log(`Viewing details for log with ID: ${logId}`);
-    // You can open a modal or navigate to a details page here
-}

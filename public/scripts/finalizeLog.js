@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 const logEntries = await fetchLogEntries();
 
-                if (logEntries.logs.length === 0) {
+                if (logEntries.length === 0) {
                     displayMessage('No log entries found.', 'error');
                     return;
                 }
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     totalMiles: parseFloat(document.getElementById('totalMiles').value) || 0,
                     fuelPurchase: document.getElementById('fuelPurchase').value || 'N/A',
                     comments: document.getElementById('comments').value || 'N/A'
-                }, logEntries.logs);
+                }, logEntries);
 
                 const emailData = {
                     to: "recipient@example.com", // Set recipient
@@ -58,14 +58,26 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to fetch log entries from Google Cloud Storage
     async function fetchLogEntries() {
         try {
-            const response = await fetch('/api/logs');
+            // First try to get logs from Cloud Storage
+            const token = localStorage.getItem('googleToken');
+            const response = await fetch('/api/logs', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
             if (!response.ok) {
-                throw new Error('Failed to fetch log entries');
+                throw new Error('Failed to fetch from Cloud Storage');
             }
-            return await response.json();
+
+            const data = await response.json();
+            return data.logs;
         } catch (error) {
-            console.error('Error fetching log entries:', error);
-            throw error;
+            console.error('Error fetching from Cloud Storage:', error);
+            // Fallback to localStorage
+            console.log('Falling back to localStorage');
+            return JSON.parse(localStorage.getItem('savedLogs')) || [];
         }
     }
 
@@ -73,24 +85,32 @@ document.addEventListener('DOMContentLoaded', function () {
     async function updateLogEntriesTable() {
         try {
             const logEntries = await fetchLogEntries();
-            tableBody.innerHTML = ''; // Clear the table
-
-            if (logEntries.logs.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7">No entries found.</td></tr>`;
-            } else {
-                logEntries.logs.forEach(entry => {
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${entry.hotel || 'N/A'}</td>
-                        <td>${entry.arrivalTime || 'N/A'}</td>
-                        <td>${entry.departureTime || 'N/A'}</td>
-                        <td>${entry.cartsDelivered || 'N/A'}</td>
-                        <td>${entry.cartsReceived || 'N/A'}</td>
-                        <td>${entry.stainBags || 'N/A'}</td>
-                        <td>${entry.calculatedWaitTime || 'N/A'}</td>
-                    `;
-                });
+            const tableBody = document.querySelector('#logEntriesTable tbody');
+            
+            if (!tableBody) {
+                console.error('Table body not found');
+                return;
             }
+
+            tableBody.innerHTML = '';
+
+            if (!logEntries || logEntries.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center">No entries found.</td></tr>';
+                return;
+            }
+
+            logEntries.forEach(entry => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td class="px-6 py-4">${entry.hotel || 'N/A'}</td>
+                    <td class="px-6 py-4">${entry.arrivalTime || 'N/A'}</td>
+                    <td class="px-6 py-4">${entry.departureTime || 'N/A'}</td>
+                    <td class="px-6 py-4">${entry.cartsDelivered || 'N/A'}</td>
+                    <td class="px-6 py-4">${entry.cartsReceived || 'N/A'}</td>
+                    <td class="px-6 py-4">${entry.stainBags || 'N/A'}</td>
+                    <td class="px-6 py-4">${entry.calculatedWaitTime || 'N/A'}</td>
+                `;
+            });
         } catch (error) {
             console.error('Error updating log entries table:', error);
             displayMessage('Failed to load log entries', 'error');

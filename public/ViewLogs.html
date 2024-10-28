@@ -3,127 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>View and Search Logs</title>
+    <title>View Logs</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="styles/output.css" rel="stylesheet">
     <link href="styles/styles.css" rel="stylesheet">
+    <script src="scripts/config.js"></script>
+    <script src="scripts/viewLogs.js" defer></script>
+    
     <style>
         body {
-            background-image: url('images/ailog.jpeg');
+            background-image: url('images/veiwl.jpeg');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
-            min-height: 100vh;
         }
 
-        #logo {
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 8px;
-            max-width: 150px;
-            width: 100%;
-            height: auto;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 90%;
         }
 
-        .form-container {
-            margin-top: auto;
-            width: 100%;
-            max-width: 600px;
+        .search-container {
+            background-color: white;
             padding: 1rem;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 1rem;
         }
 
-        @media (min-width: 640px) {
-            .form-container {
-                padding: 2rem;
-            }
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
-        input, select, button {
-            font-size: 16px;
-            height: 3rem;
+        table {
+            width: 100%;
+            background-color: white;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
-        .table-container {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
         }
 
-        .btn-primary {
-            background-color: #4A90E2;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            transition: background-color 0.3s;
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
         }
 
-        .btn-primary:hover {
-            background-color: #357ABD;
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex flex-col items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
-        <div class="form-container space-y-6">
-            <div class="text-center">
-                <img id="logo" src="images/logmelogo.jpg" alt="App Logo" class="mx-auto">
-                <h1 class="mt-6 text-3xl font-extrabold text-gray-900">View and Search Logs</h1>
-            </div>
-            
-            <form id="searchForm" class="mt-8 space-y-6">
-                <div class="rounded-md shadow-sm -space-y-px">
-                    <div>
-                        <label for="driverName" class="sr-only">Driver Name</label>
-                        <input type="text" id="driverName" name="driverName" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Driver Name">
-                    </div>
-                    <div>
-                        <label for="truckNumber" class="sr-only">Truck Number</label>
-                        <input type="text" id="truckNumber" name="truckNumber" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Truck Number">
-                    </div>
-                    <div>
-                        <label for="date" class="sr-only">Date</label>
-                        <input type="date" id="date" name="date" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm">
-                    </div>
-                    <div>
-                        <label for="hotel" class="sr-only">Hotel</label>
-                        <input type="text" id="hotel" name="hotel" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Hotel">
-                    </div>
+
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6">View Logs</h1>
+        
+        <!-- Search Form -->
+        <div class="search-container mb-6">
+            <form id="searchForm" class="search-grid">
+                <div>
+                    <label for="driverName" class="block text-sm font-medium text-gray-700">Driver Name</label>
+                    <input type="text" id="driverName" name="driverName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                 </div>
                 <div>
-                    <button type="submit" class="btn-primary group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Search Logs
+                    <label for="truckNumber" class="block text-sm font-medium text-gray-700">Truck Number</label>
+                    <input type="text" id="truckNumber" name="truckNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
+                    <input type="date" id="date" name="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                <div>
+                    <label for="hotel" class="block text-sm font-medium text-gray-700">Hotel</label>
+                    <select id="hotel" name="hotel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="">All Hotels</option>
+                        <!-- Hotels will be populated from config.js -->
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="btn-primary">
+                        Search
+                    </button>
+                </div>
+                <div class="flex items-end">
+                    <button type="reset" class="btn-secondary">
+                        Clear
                     </button>
                 </div>
             </form>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table id="logEntriesTable" class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hotel</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Arrival Time</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure Time</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carts Delivered</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carts Received</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stain Bags</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wait Time</th>
+                    </tr>
+                </thead>
+                <tbody id="logEntries" class="bg-white divide-y divide-gray-200">
+                    <!-- Log entries will be inserted here -->
+                </tbody>
+            </table>
+        </div>
 
-            <div id="searchResults" class="mt-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Search Results</h2>
-                <div class="table-container">
-                    <table id="logEntriesTable" class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Driver Name</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Truck Number</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hotel</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logEntries" class="bg-white divide-y divide-gray-200">
-                            <!-- Log entries will be dynamically inserted here -->
-                        </tbody>
-                    </table>
-                </div>
-                <div id="pagination" class="mt-6 flex justify-center space-x-2">
-                    <!-- Pagination controls will be dynamically inserted here -->
-                </div>
-            </div>
+        <div id="pagination" class="mt-4 flex justify-center space-x-2">
+            <!-- Pagination buttons will be inserted here -->
+        </div>
+
+        <div class="button-container">
+            <button onclick="window.location.href='DriverDeliveryLogForm.html'" class="btn-primary">
+                Home
+            </button>
+            <button onclick="window.location.href='AddLogEntry.html'" class="btn-secondary">
+                Add New Log
+            </button>
         </div>
     </div>
 
-    <script src="scripts/viewLogs.js"></script>
+    <!-- Add this after loading config.js but before the closing </body> tag -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate hotels dropdown
+            const hotelSelect = document.getElementById('hotel');
+            if (hotelSelect && typeof HOTELS !== 'undefined') {
+                console.log('Populating hotels dropdown with:', HOTELS);
+                hotelSelect.innerHTML = '<option value="">All Hotels</option>';
+                HOTELS.forEach(hotel => {
+                    const option = document.createElement('option');
+                    option.value = hotel;
+                    option.textContent = hotel;
+                    hotelSelect.appendChild(option);
+                });
+            } else {
+                console.error('Hotel select not found or HOTELS not defined');
+            }
+        });
+    </script>
 </body>
+
 </html>

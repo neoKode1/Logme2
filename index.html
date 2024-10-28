@@ -6,11 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Welcome to LogMe</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="public/styles/output.css" rel="stylesheet">
-    <link href="public/styles/styles.css" rel="stylesheet">
+    <link href="styles/output.css" rel="stylesheet">
+    <link href="styles/styles.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
-    <script src="public/scripts/auth.js"></script>
+    <script src="scripts/auth.js" defer></script>
 
     <style>
         body {
@@ -26,10 +25,8 @@
             align-items: center;
         }
 
-
         .overlay {
             background-color: rgba(0, 0, 0, 0.5);
-            /* Add a slight dark overlay */
             position: absolute;
             top: 0;
             left: 0;
@@ -48,7 +45,6 @@
 
         .btn-primary {
             background-color: #4A90E2;
-            /* Customize your button color */
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 0.375rem;
@@ -79,29 +75,45 @@
     <div class="overlay"></div>
     <div class="content flex items-center justify-center h-full text-center">
         <div>
-            <img id="logo" src="public/images/logmelogo.jpg" alt="App Logo" class="logo mx-auto">
+            <img id="logo" src="images/logmelogo.jpg" alt="App Logo" class="logo mx-auto">
 
             <h1 class="text-white text-4xl font-extrabold mt-4">Welcome to LogMe</h1>
             
             <!-- Google Sign-In button -->
             <div id="g_id_onload"
-                 data-client_id="851921648343-kvhsn7ttiv1s363tpjpkv35a3rhe8m7s.apps.googleusercontent.com"
-                 data-callback="handleCredentialResponse">
+                 data-client_id="961881523445-udbj006kluhai8bfqnu6j4r7qp9mb81j.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false"
+                 data-itp_support="true">
             </div>
-            <div class="g_id_signin mt-4" data-type="standard"></div>
-            
-            <button id="startbutton" onclick="startLogging()" class="btn-primary mt-8">Start Logging</button>
-            <button id="viewLogsButton" onclick="window.location.href='public/ViewLogs.html'" class="btn-primary mt-4" style="display: none;">View Logs</button>
+            <div class="g_id_signin mt-4" 
+                 data-type="standard"
+                 data-shape="pill"
+                 data-theme="filled_blue"
+                 data-text="continue_with"
+                 data-size="large"
+                 data-logo_alignment="center"
+                 data-width="300">
+            </div>
         </div>
     </div>
 
+    <!-- Add this just before the closing </body> tag -->
     <script>
-        function startLogging() {
-            window.location.href = 'public/DriverDeliveryLogForm.html';
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== HTML Client ID Verification ===');
+            const clientIdElement = document.querySelector('#g_id_onload');
+            if (clientIdElement) {
+                console.log('Client ID in HTML:', clientIdElement.getAttribute('data-client_id'));
+                console.log('Client ID length:', clientIdElement.getAttribute('data-client_id').length);
+            } else {
+                console.error('Google Sign-In button element not found!');
+            }
+            console.log('===============================');
+        });
     </script>
-    
-    
 </body>
 
 </html>

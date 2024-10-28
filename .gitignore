@@ -34,7 +34,12 @@ node_modules/
 
 # Google Cloud credentials
 *.json
-client_secret.json
+!package.json
+!package-lock.json
+google_logme.json
+logme2-*.json
+credentials.json
+token.json
 
 # Logs
 logs
@@ -117,5 +122,3 @@ typings/
 tmp/
 temp/
 .env
-
-logmeclient.json

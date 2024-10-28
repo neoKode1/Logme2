@@ -93,6 +93,9 @@
                         class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         Finalize Log
                     </button>
+                    <button onclick="window.location.href='ViewLogs.html'" class="mt-4 group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        View Logs
+                    </button>
                 </div>
             </form>
         </div>
@@ -123,6 +126,59 @@
     <script src="scripts/emailService.js"></script>
     <script src="scripts/finalizeLog.js"></script>
     <script src="scripts/app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to populate the log entries table from localStorage
+            function updateLoggedDataTable() {
+                const tableBody = document.querySelector('#logEntriesTable tbody');
+                if (!tableBody) {
+                    console.log('Table body element not found');
+                    return;
+                }
+
+                const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
+                console.log('Retrieved logs from localStorage:', logEntries);
+                
+                tableBody.innerHTML = '';
+
+                if (logEntries.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No logs found</td></tr>';
+                    return;
+                }
+
+                logEntries.forEach(entry => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td class="px-6 py-4">${entry.hotel || 'N/A'}</td>
+                        <td class="px-6 py-4">${entry.arrivalTime || 'N/A'}</td>
+                        <td class="px-6 py-4">${entry.departureTime || 'N/A'}</td>
+                        <td class="px-6 py-4">${entry.cartsDelivered || 'N/A'}</td>
+                        <td class="px-6 py-4">${entry.cartsReceived || 'N/A'}</td>
+                        <td class="px-6 py-4">${entry.stainBags || 'N/A'}</td>
+                        <td class="px-6 py-4">${entry.calculatedWaitTime || 'N/A'}</td>
+                    `;
+                });
+            }
+
+            // Calculate total miles when odometer finish changes
+            const odometerFinish = document.getElementById('odometerFinish');
+            if (odometerFinish) {
+                odometerFinish.addEventListener('input', calculateTotalMiles);
+            }
+
+            // Initial population of the table
+            updateLoggedDataTable();
+            calculateTotalMiles();
+        });
+
+        // Function to calculate total miles
+        function calculateTotalMiles() {
+            const start = parseFloat(localStorage.getItem('odometerStart')) || 0;
+            const finish = parseFloat(document.getElementById('odometerFinish').value) || 0;
+            document.getElementById('totalMiles').value = Math.max(finish - start, 0);
+        }
+    </script>
 
 </body>
 

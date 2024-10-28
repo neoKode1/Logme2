@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "build": "tailwindcss -i src/input.css -o public/output.css",
+    "build": "tailwindcss -i src/input.css -o public/styles/output.css --watch",
+    "build:prod": "tailwindcss -i src/input.css -o public/styles/output.css --minify",
     "watch": "tailwindcss -i src/input.css -o public/output.css --watch",
     "build:css": "tailwindcss -i src/main/webapp/styles/globals.css -o src/main/webapp/styles/output.css --watch"
   },

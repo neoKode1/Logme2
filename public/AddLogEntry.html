@@ -6,8 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Add Log Entry</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Update these paths to be relative to the current directory -->
     <link href="styles/output.css" rel="stylesheet">
     <link href="styles/styles.css" rel="stylesheet">
+    <script src="scripts/config.js"></script>
+    <script src="scripts/app.js"></script>
+    
     <style>
         body {
             background-image: url('images/drivergrey.jpeg');
@@ -17,18 +21,12 @@
             background-attachment: fixed;
         }
 
-        #logo {
-            border-radius: 8px;
-            max-width: 150px;
-            width: 100%;
-            height: auto;
-        }
-
         .form-container {
             width: 100%;
             max-width: 400px;
             margin: auto;
             padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.95);
         }
 
         @media (min-width: 640px) {
@@ -40,6 +38,19 @@
         input, select, button {
             font-size: 16px;
             height: 3rem;
+            background-color: white !important;
+            color: #1a202c !important;
+        }
+
+        /* Use the button styles from styles.css */
+        #submitLogEntryBtn {
+            background-color: #357ABD !important;
+            color: white !important;
+        }
+
+        #saveAndContinueBtn {
+            background-color: #4CAF50 !important;
+            color: white !important;
         }
     </style>
 </head>
@@ -54,59 +65,62 @@
             <form id="logEntryForm" class="space-y-6">
                 <div class="rounded-md shadow-sm space-y-4">
                     <div>
-                        <label for="hotel" class="sr-only">Hotel:</label>
+                        <label for="hotel" class="block text-sm font-medium text-gray-700 mb-1">Hotel Location:</label>
                         <select name="hotel" id="hotel" required
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="" disabled selected>Select a hotel</option>
+                            <option value="" disabled selected>Select Hotel Location</option>
                         </select>
                     </div>
                     <div>
-                        <label for="arrivalTime" class="sr-only">Arrival Time:</label>
+                        <label for="arrivalTime" class="block text-sm font-medium text-gray-700 mb-1">Arrival Time:</label>
                         <input type="time" name="arrivalTime" id="arrivalTime" required
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="Time In">
+                            placeholder="Enter Arrival Time">
                     </div>
                     <div>
-                        <label for="departureTime" class="sr-only">Departure Time:</label>
+                        <label for="departureTime" class="block text-sm font-medium text-gray-700 mb-1">Departure Time:</label>
                         <input type="time" name="departureTime" id="departureTime" required
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="Time Out">
+                            placeholder="Enter Departure Time">
                     </div>
                     <div>
-                        <label for="cartsDelivered" class="sr-only">Carts Delivered:</label>
+                        <label for="cartsDelivered" class="block text-sm font-medium text-gray-700 mb-1">Carts Delivered:</label>
                         <select name="cartsDelivered" id="cartsDelivered" required
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="" disabled selected>Carts Delivered</option>
+                            <option value="" disabled selected>Number of Carts Delivered</option>
                         </select>
                     </div>
                     <div>
-                        <label for="cartsReceived" class="sr-only">Carts Received:</label>
+                        <label for="cartsReceived" class="block text-sm font-medium text-gray-700 mb-1">Carts Received:</label>
                         <select name="cartsReceived" id="cartsReceived" required
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="" disabled selected>Carts Received</option>
+                            <option value="" disabled selected>Number of Carts Received</option>
                         </select>
                     </div>
                     <div>
-                        <label for="stainBags" class="sr-only">Stain Bags (Optional):</label>
+                        <label for="stainBags" class="block text-sm font-medium text-gray-700 mb-1">Stain Bags:</label>
                         <select name="stainBags" id="stainBags"
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="" disabled selected>Stain Bags</option>
+                            <option value="" disabled selected>Number of Stain Bags (Optional)</option>
                         </select>
                     </div>
                     <div>
-                        <label for="calculatedWaitTime" class="sr-only">Wait Time (Optional):</label>
+                        <label for="calculatedWaitTime" class="block text-sm font-medium text-gray-700 mb-1">Wait Time:</label>
                         <input type="text" name="calculatedWaitTime" id="calculatedWaitTime" readonly
                             class="block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            placeholder="Wait Time">
+                            placeholder="Calculated Wait Time (Auto-filled)">
                     </div>
                 </div>
                 <div class="space-y-4">
                     <button type="button" id="submitLogEntryBtn"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                        style="background-color: #357ABD; color: midnightblue;">
                         Save Log Entry
                     </button>
-                    <button type="button" id="saveAndContinueBtn"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out">
+                    <button type="button" id="saveAndContinueBtn" 
+                        onclick="saveAndContinue()"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
+                        style="background-color: #4CAF50; color: white;">
                         Save & Continue
                     </button>
                 </div>
@@ -159,41 +173,89 @@
     </div>
 
     <script>
-        const hotels = [
-            "Marriot Marquis", "Chateau Elan", "Ritz Carlton", "Indigo", "Candler", "Kimpton",
-            "Marriott Airport", "Starling", "Bellyard/Rooftop", "Loews",
-            "Hilton Downtown", "Regis", "Thompson", "Galleria", "Westin",
-            "Avalon", "Hamilton", "Colee", "Westin North", "Westin Buckhead", "Westin Peachtree", "Courtland",
-            "Embassy Suites", "The American", "Montgomery", "Cambria/Margaritaville"
-        ];
-
         document.addEventListener('DOMContentLoaded', function () {
-            // Populate the hotel dropdown
-            const hotelSelect = document.getElementById('hotel');
-            populateDropdown(hotelSelect, hotels);
-
-            // Populate the carts and stain bags dropdowns with dynamic options
+            // Populate dropdowns
             const cartsOptions = Array.from({ length: 20 }, (_, i) => i + 1); // Options 1 to 20
-            populateDropdown(document.getElementById('cartsDelivered'), cartsOptions, "Carts Delivered");
-            populateDropdown(document.getElementById('cartsReceived'), cartsOptions, "Carts Received");
-            populateDropdown(document.getElementById('stainBags'), cartsOptions, "Stain Bags");
+            populateDropdown(document.getElementById('cartsDelivered'), cartsOptions, "Number of Carts Delivered");
+            populateDropdown(document.getElementById('cartsReceived'), cartsOptions, "Number of Carts Received");
+            populateDropdown(document.getElementById('stainBags'), cartsOptions, "Number of Stain Bags (Optional)");
 
-            function populateDropdown(dropdown, optionsArray, placeholder = "") {
-                dropdown.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
-                optionsArray.forEach(optionText => {
-                    const option = document.createElement('option');
-                    option.value = optionText;
-                    option.textContent = optionText;
-                    dropdown.appendChild(option);
-                });
-            }
-
+            // Add event listeners for time inputs
             const arrivalTimeInput = document.getElementById('arrivalTime');
             const departureTimeInput = document.getElementById('departureTime');
             const calculatedWaitTimeInput = document.getElementById('calculatedWaitTime');
 
-            arrivalTimeInput.addEventListener('input', calculateWaitTime);
-            departureTimeInput.addEventListener('input', calculateWaitTime);
+            // Add event listeners for buttons
+            const submitLogEntryBtn = document.getElementById('submitLogEntryBtn');
+            const saveAndContinueBtn = document.getElementById('saveAndContinueBtn');
+
+            if (submitLogEntryBtn) {
+                submitLogEntryBtn.addEventListener('click', function() {
+                    saveLogEntry(false);
+                });
+            }
+
+            if (saveAndContinueBtn) {
+                saveAndContinueBtn.addEventListener('click', function() {
+                    console.log('Save & Continue button clicked');
+                    
+                    // Check if there are any saved logs
+                    const savedLogs = JSON.parse(localStorage.getItem('savedLogs')) || [];
+                    
+                    if (savedLogs.length > 0) {
+                        // If there are saved logs, navigate directly
+                        console.log('Saved logs found, navigating to FinalizeDailyLog.html');
+                        window.location.href = 'FinalizeDailyLog.html';
+                        return;
+                    }
+
+                    // If no saved logs, validate and save current form
+                    const form = document.getElementById('logEntryForm');
+                    
+                    // Check each required field
+                    const hotel = document.getElementById('hotel').value;
+                    const arrivalTime = document.getElementById('arrivalTime').value;
+                    const departureTime = document.getElementById('departureTime').value;
+                    const cartsDelivered = document.getElementById('cartsDelivered').value;
+                    const cartsReceived = document.getElementById('cartsReceived').value;
+
+                    if (!hotel || !arrivalTime || !departureTime || !cartsDelivered || !cartsReceived) {
+                        console.log('Form validation failed');
+                        displayMessage('Please fill in all required fields', 'error');
+                        return;
+                    }
+
+                    // If validation passes, save and navigate
+                    const logEntry = {
+                        hotel,
+                        arrivalTime,
+                        departureTime,
+                        cartsDelivered,
+                        cartsReceived,
+                        stainBags: document.getElementById('stainBags').value,
+                        calculatedWaitTime: document.getElementById('calculatedWaitTime').value
+                    };
+
+                    try {
+                        savedLogs.push(logEntry);
+                        localStorage.setItem('savedLogs', JSON.stringify(savedLogs));
+                        console.log('Log entry saved, navigating to FinalizeDailyLog.html');
+                        window.location.href = 'FinalizeDailyLog.html';
+                    } catch (error) {
+                        console.error('Error saving log entry:', error);
+                        displayMessage('Error saving log entry', 'error');
+                    }
+                });
+            }
+
+            // Initialize the page
+            updateLoggedDataTable();
+
+            // Add event listeners to time inputs for wait time calculation
+            if (arrivalTimeInput && departureTimeInput) {
+                arrivalTimeInput.addEventListener('change', calculateWaitTime);
+                departureTimeInput.addEventListener('change', calculateWaitTime);
+            }
 
             function calculateWaitTime() {
                 const arrivalTime = arrivalTimeInput.value;
@@ -203,115 +265,91 @@
                     const [arrivalHours, arrivalMinutes] = arrivalTime.split(':').map(Number);
                     const [departureHours, departureMinutes] = departureTime.split(':').map(Number);
 
-                    const arrivalDate = new Date();
-                    arrivalDate.setHours(arrivalHours, arrivalMinutes, 0, 0);
+                    let arrivalDate = new Date();
+                    arrivalDate.setHours(arrivalHours, arrivalMinutes, 0);
 
-                    const departureDate = new Date();
-                    departureDate.setHours(departureHours, departureMinutes, 0, 0);
+                    let departureDate = new Date();
+                    departureDate.setHours(departureHours, departureMinutes, 0);
 
-                    let waitTimeMinutes = (departureDate - arrivalDate) / (1000 * 60);
-
-                    // If the departure time is before arrival time, assume it's the next day
-                    if (waitTimeMinutes < 0) {
-                        waitTimeMinutes += 24 * 60;  // Add 24 hours worth of minutes
+                    // If departure is before arrival, assume it's the next day
+                    if (departureDate < arrivalDate) {
+                        departureDate.setDate(departureDate.getDate() + 1);
                     }
 
-                    if (waitTimeMinutes >= 0) {
-                        const hours = Math.floor(waitTimeMinutes / 60);
-                        const minutes = waitTimeMinutes % 60;
-                        calculatedWaitTimeInput.value = `${hours}h ${minutes}m`;
-                    } else {
-                        calculatedWaitTimeInput.value = "Invalid";
-                    }
+                    const waitTimeMinutes = (departureDate - arrivalDate) / (1000 * 60);
+                    const hours = Math.floor(waitTimeMinutes / 60);
+                    const minutes = Math.round(waitTimeMinutes % 60);
+
+                    calculatedWaitTimeInput.value = `${hours}h ${minutes}m`;
                 } else {
-                    calculatedWaitTimeInput.value = "";
+                    calculatedWaitTimeInput.value = '';
                 }
             }
 
-            // Event listeners for buttons
-            document.getElementById('submitLogEntryBtn').addEventListener('click', submitLogEntry);
-            document.getElementById('saveAndContinueBtn').addEventListener('click', function () {
-                submitLogEntry();  // Save the log entry before navigating
-                window.location.href = 'FinalizeDailyLog.html' // Redirect to the finalize log page
-            });
+            function saveLogEntry(shouldContinue) {
+                console.log('=== Save Log Entry Function Called ===');
+                console.log('shouldContinue:', shouldContinue);
+                
+                // Check if there are any saved logs first
+                const savedLogs = JSON.parse(localStorage.getItem('savedLogs')) || [];
+                
+                // If we have saved logs and we're continuing, navigate directly
+                if (savedLogs.length > 0 && shouldContinue) {
+                    console.log('Saved logs found, navigating to FinalizeDailyLog.html');
+                    window.location.href = 'FinalizeDailyLog.html';
+                    return;
+                }
 
-            function updateLoggedDataTable() {
-                const tableBody = document.querySelector('#loggedDataTable tbody');
-                const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-                tableBody.innerHTML = '';
+                // Otherwise, validate and save the current form
+                const form = document.getElementById('logEntryForm');
+                if (!form.checkValidity()) {
+                    console.log('Form validation failed');
+                    form.reportValidity();
+                    return;
+                }
 
-                logEntries.forEach((entry, index) => {
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${entry.hotel || ''}</td>
-                        <td>${entry.arrivalTime || ''}</td>
-                        <td>${entry.departureTime || ''}</td>
-                        <td>${entry.cartsDelivered || ''}</td>
-                        <td>${entry.cartsReceived || ''}</td>
-                        <td>${entry.stainBags || ''}</td>
-                        <td>${entry.calculatedWaitTime || ''}</td>
-                        <td>
-                            <button class="edit-btn text-indigo-600 hover:text-indigo-900" onclick="editLogEntry(${index})">Edit</button>
-                            <button class="delete-btn text-white bg-red-600 hover:bg-red-800 px-2 py-1 rounded ml-2" onclick="deleteLogEntry(${index})">Delete</button>
-                        </td>
-                    `;
-                });
-            }
+                const logEntry = {
+                    hotel: document.getElementById('hotel').value,
+                    arrivalTime: document.getElementById('arrivalTime').value,
+                    departureTime: document.getElementById('departureTime').value,
+                    cartsDelivered: document.getElementById('cartsDelivered').value,
+                    cartsReceived: document.getElementById('cartsReceived').value,
+                    stainBags: document.getElementById('stainBags').value,
+                    calculatedWaitTime: document.getElementById('calculatedWaitTime').value
+                };
+                console.log('Log Entry Data:', logEntry);
 
-            updateLoggedDataTable();
+                try {
+                    savedLogs.push(logEntry);
+                    localStorage.setItem('savedLogs', JSON.stringify(savedLogs));
+                    console.log('Log entry saved to localStorage');
 
-            window.editLogEntry = function (index) {
-                const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-                const entryToEdit = logEntries[index];
-
-                document.getElementById('hotel').value = entryToEdit.hotel || '';
-                document.getElementById('arrivalTime').value = entryToEdit.arrivalTime || '';
-                document.getElementById('departureTime').value = entryToEdit.departureTime || '';
-                document.getElementById('cartsDelivered').value = entryToEdit.cartsDelivered || '';
-                document.getElementById('cartsReceived').value = entryToEdit.cartsReceived || '';
-                document.getElementById('stainBags').value = entryToEdit.stainBags || '';
-                document.getElementById('calculatedWaitTime').value = entryToEdit.calculatedWaitTime || '';
-
-                logEntries.splice(index, 1);
-                localStorage.setItem('savedLogs', JSON.stringify(logEntries));
-                updateLoggedDataTable();
-            };
-
-            window.deleteLogEntry = function (index) {
-                const logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-                logEntries.splice(index, 1);
-                localStorage.setItem('savedLogs', JSON.stringify(logEntries));
-                updateLoggedDataTable();
-            };
-
-            function submitLogEntry() {
-                const logEntryForm = document.getElementById('logEntryForm');
-                if (logEntryForm) {
-                    const formData = new FormData(logEntryForm);
-                    const logEntry = Object.fromEntries(formData.entries());
-
-                    let logEntries = JSON.parse(localStorage.getItem('savedLogs')) || [];
-                    logEntry.id = Date.now(); // Add a unique ID to each log entry
-                    logEntries.push(logEntry);
-                    localStorage.setItem('savedLogs', JSON.stringify(logEntries));
-
+                    // Update the table
                     updateLoggedDataTable();
+                    form.reset();
 
-                    // Reset the form to empty the inputs
-                    logEntryForm.reset();
-
-                    // Reset the dropdowns to the placeholder options
-                    document.getElementById('hotel').selectedIndex = 0;
-                    document.getElementById('cartsDelivered').selectedIndex = 0;
-                    document.getElementById('cartsReceived').selectedIndex = 0;
-                    document.getElementById('stainBags').selectedIndex = 0;
-                } else {
-                    console.error('Log entry form not found.');
+                    if (shouldContinue) {
+                        console.log('Navigating to FinalizeDailyLog.html');
+                        window.location.replace('FinalizeDailyLog.html');
+                    } else {
+                        displayMessage('Log entry saved successfully', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error in saveLogEntry:', error);
+                    displayMessage('Error saving log entry', 'error');
                 }
             }
         });
+
+        // Function to display messages
+        function displayMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.className = `fixed top-4 right-4 p-4 rounded shadow-lg ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
+            document.body.appendChild(messageDiv);
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
     </script>
-    <script src="scripts/app.js"></script>
 </body>
 
 </html>
